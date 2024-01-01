@@ -98,20 +98,21 @@ WSGI_APPLICATION = "plant_detection.wsgi.application"
 #         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
-
+import dj_database_url
 # Remove hardcoded credentials
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', ''),
-        'USER': os.environ.get('DB_USER', ''),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-        'OPTIONS': {
-            'client_encoding': 'UTF8',  # Correct parameter for PostgreSQL
-        },
-    }
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'), conn_max_age=600),
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': os.environ.get('DB_NAME', ''),
+    #     'USER': os.environ.get('DB_USER', ''),
+    #     'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+    #     'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+    #     'PORT': os.environ.get('DB_PORT', '5432'),
+    #     'OPTIONS': {
+    #         'client_encoding': 'UTF8',  # Correct parameter for PostgreSQL
+    #     },
+    # }
 }
 
 # Email Backend
@@ -182,11 +183,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Base directory
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Static Files Configuration
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is crucial
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'accounts/static'),
+    os.path.join(BASE_DIR, 'backend/static'),
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

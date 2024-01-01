@@ -24,9 +24,8 @@ from accounts.views import welcome_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", include("accounts.urls")),  # Include accounts URLs at the root
     path("api/", include("backend.urls")), 
-    path('', include('accounts.urls')),
-    # path('', welcome_view, name='welcome'), 
 ]
 
 # Serve media files during development

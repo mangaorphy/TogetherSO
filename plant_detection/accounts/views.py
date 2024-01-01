@@ -1,4 +1,4 @@
-# users/views.py
+# accounts/views.py
 from django.shortcuts import render
 from django.views.generic import CreateView, TemplateView, RedirectView
 from django.contrib.auth import login,logout
@@ -29,16 +29,13 @@ class SignUpView(CreateView):
         return to_return
 
 class ActivateView(RedirectView):
-
     url = reverse_lazy('success')
 
-    # Custom get method
     def get(self, request, uidb64, token):
-
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
-            user = user_model.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, user_model.DoesNotExist):
+            user = User.objects.get(pk=uid)  # Corrected from user_model to User
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
         if user is not None and token_generator.check_token(user, token):
@@ -47,13 +44,13 @@ class ActivateView(RedirectView):
             login(request, user)
             return super().get(request, uidb64, token)
         else:
-            return render(request, 'users/activate_account_invalid.html')
+            return render(request, 'accounts/activate_account_invalid.html')
         
 class CheckEmailView(TemplateView):
-    template_name = 'users/check_email.html'
+    template_name = 'accounts/check_email.html'
 
 class SuccessView(TemplateView):
-    template_name = 'users/success.html'
+    template_name = 'accounts/success.html'
 
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
@@ -63,7 +60,7 @@ from django.shortcuts import redirect
 
 #     def dispatch(self, request, *args, **kwargs):
 #         if request.user.is_authenticated:
-#             return redirect('dashboard')  # Redirect authenticated users to the dashboard
+#             return redirect('dashboard')  # Redirect authenticated accounts to the dashboard
 #         return super().dispatch(request, *args, **kwargs)
     
 
@@ -88,27 +85,29 @@ def custom_login_view(request):
     Custom login view for TogetherSO.
     """
     if request.user.is_authenticated:
-        return redirect('dashboard')  # Redirect authenticated users
+        return redirect('dashboard')  # Redirect authenticated users to the dashboard
 
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                return redirect('dashboard')
-            else:
-                messages.error(request, 'Account not activated. Please check your email.')
+        if user is not None and user.is_active:
+            login(request, user)
+
+            # Get the 'next' parameter from POST or GET
+            next_url = request.POST.get('next', '') or request.GET.get('next', '')
+
+            # Default to 'dashboard' if 'next' is empty or invalid
+            if not next_url:
+                next_url = reverse_lazy('dashboard')
+
+            return redirect(next_url)  # Redirect to the intended page
         else:
-            messages.error(request, 'Invalid username or password.')
-        
-        return redirect('login')  # Always redirect after POST
-    
-    # GET request - show login form
-    return render(request, 'accounts/login.html')
+            messages.error(request, 'Invalid credentials or account not activated.')
+            return redirect('login')  # Redirect back to login page with error message
+
+    return render(request, 'accounts/login.html')  # Use the accounts login template
 
 def register(request):
     """
@@ -151,6 +150,6 @@ def welcome_view(request):
     If the user is already authenticated, redirect to the dashboard.
     """
     if request.user.is_authenticated:
-        return redirect('home')  # Redirect authenticated users to the home
+        return redirect('home')  # Redirect authenticated accounts to the home
 
     return render(request, 'accounts/welcome.html')

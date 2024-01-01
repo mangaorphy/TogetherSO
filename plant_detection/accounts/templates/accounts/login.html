@@ -16,63 +16,65 @@
             <button class="close-btn" id="close-register">&times;</button>
         </div>
 
-        <form method="POST" action="{% url 'login' %}" class="register-form">
-            {% csrf_token %}
-            {% if error %}
-                <p class="error">{{ error }}</p>
-            {% endif %}
+        <!-- accounts/templates/accounts/login.html -->
 
-            <!-- Username Input -->
-            <div class="input-box">
-                <label for="username" class="sr-only">Username</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    class="input-field" 
-                    placeholder="Enter your username" 
-                    required 
-                    autocomplete="off"
-                >
-            </div>
+<form method="POST" action="{% url 'login' %}" class="register-form">
+    {% csrf_token %}
 
-            <!-- Password Input -->
-            <div class="input-box">
-                <label for="password" class="sr-only">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    class="input-field" 
-                    placeholder="Enter your password" 
-                    required 
-                    autocomplete="new-password"
-                >
-            </div>
+    <!-- Hidden Field for Next Page -->
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
 
-            <!-- Remember Me & Forgot Password -->
-            <div class="forgot">
-                <section>
-                    <input type="checkbox" id="check" name="remember_me">
-                    <label for="check">Remember me</label>
-                </section>
-                <section>
-                    <a href="{% url 'password_reset' %}" class="forgot-password-link">Forgot Password?</a>
-                </section>
-            </div>
+    <!-- Username Input -->
+    <div class="input-box">
+        <label for="username" class="sr-only">Username</label>
+        <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            class="input-field" 
+            placeholder="Enter your username" 
+            required 
+            autocomplete="off"
+        >
+    </div>
 
-            <!-- Submit Button -->
-            <div class="input-submit">
-                <button type="submit" class="submit-btn" id="submit">
-                    Sign In
-                </button>
-            </div>
+    <!-- Password Input -->
+    <div class="input-box">
+        <label for="password" class="sr-only">Password</label>
+        <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="input-field" 
+            placeholder="Enter your password" 
+            required 
+            autocomplete="new-password"
+        >
+    </div>
 
-            <!-- Register Link -->
-            <div class="register-link">
-                <p>Don't have an account? <a href="{% url 'register' %}" class="register-link-text">Sign Up</a></p>
-            </div>
-        </form>
+    <!-- Remember Me & Forgot Password -->
+    <div class="forgot d-flex justify-content-between align-items-center">
+        <section>
+            <input type="checkbox" id="check" name="remember_me">
+            <label for="check">Remember me</label>
+        </section>
+        <section>
+            <a href="{% url 'password_reset' %}" class="forgot-password-link text-success">Forgot Password?</a>
+        </section>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="input-submit mt-4">
+        <button type="submit" class="submit-btn btn-auth w-100" id="submit">
+            Sign In
+        </button>
+    </div>
+
+    <!-- Register Link -->
+    <div class="register-link text-center mt-3">
+        <p>Don't have an account? <a href="{% url 'signup' %}" class="register-link-text text-success">Sign Up</a></p>
+    </div>
+</form>
     </div>
 </div>
 
@@ -82,6 +84,7 @@
         const form = document.querySelector('.register-form');
         const errorElement = document.querySelector('.error');
 
+        // Form validation
         form.addEventListener('submit', (event) => {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
@@ -92,9 +95,6 @@
             } else {
                 errorElement.textContent = ''; // Clear error message
             }
-
-            // Clear error message if valid
-            errorElement.textContent = '';
         });
 
         // Close overlay

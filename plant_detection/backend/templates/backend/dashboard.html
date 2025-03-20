@@ -1,0 +1,182 @@
+{% extends "backend/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    overflow-x: hidden;
+  }
+  @media only screen and (max-width: 830px) {
+    .laptop {
+      display: none;
+    }
+  }
+  @media (min-width: 830px) and (max-width: 1536px) {
+    .mobile {
+      display: none;
+    }
+  }
+  .dashboard-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+  }
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+  }
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #333;
+  }
+  .card-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4CAF50;
+  }
+  #dashboard-header {
+    background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url("{% static 'images/background-plants.jpg' %}");
+    background-size: cover;
+    background-position: center;
+    padding: 60px 0;
+  }
+  .section-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+  .section-subtitle {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    margin-bottom: 40px;
+  }
+  .border-bottom {
+    width: 50px;
+    height: 3px;
+    background-color: #4CAF50;
+    margin: 0 auto 20px;
+  }
+</style>
+
+<!-- Mobile Warning -->
+<div class="mobile p-5">
+  <div class="row mb-5 text-center text-white">
+    <div class="col-lg-10 mx-auto">
+      <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color:red;"><b>Note✍🏻</b></h1>
+      <p class="lead" style="font-weight: 500;color: black;">Please🙏 Open This Site On Laptop/PC 💻 Screen Only</p>
+      <p class="lead" style="font-weight: 500;color: black;">Thank You 🤝</p>    
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard Header -->
+<section id="dashboard-header" class="text-center laptop">
+  <div class="container">
+    <h1 class="display-4 fw-bold" style="color: rgb(4, 54, 4);">Plant Disease Detection Dashboard</h1>
+    <p class="lead" style="color: black;">Monitor and manage plant health with real-time insights.</p>
+    <div class="border-bottom"></div>
+  </div>
+</section>
+
+<!-- Dashboard Cards -->
+<section class="py-5 laptop">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <h5 class="card-title">Total Farmers</h5>
+            <p class="card-text">{{ total_farmers }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <h5 class="card-title">Total Plants</h5>
+            <p class="card-text">{{ total_plants }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <h5 class="card-title">Total Diseases</h5>
+            <p class="card-text">{{ total_diseases }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <h5 class="card-title">Total Pests</h5>
+            <p class="card-text">{{ total_pests }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recent Activity Section -->
+<section class="py-5 laptop">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Recent Activity</h2>
+      <p class="section-subtitle">Latest disease detection records</p>
+      <div class="border-bottom"></div>
+    </div>
+    <div class="card dashboard-card">
+      <div class="card-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Disease Name</th>
+              <th>Plant Affected</th>
+              <th>Date Detected</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for activity in recent_activity %}
+              <tr>
+                <td>{{ activity.name }}</td>
+                <td>{{ activity.plant.name }}</td>
+                <td>{{ activity.created_at|date:"Y-m-d" }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="text-center">No recent activity</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recommendations Section -->
+<section class="py-5 laptop">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title">Total Recommendations</h2>
+      <p class="section-subtitle">Actionable insights provided to farmers</p>
+      <div class="border-bottom"></div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <p class="card-text">{{ total_recommendations }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

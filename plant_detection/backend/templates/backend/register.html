@@ -1,0 +1,134 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block title %}Sign Up | TogetherSO{% endblock %}
+
+{% block extrahead %}
+<!-- Link to CSS File -->
+<link rel="stylesheet" href="{% static 'CSS/register.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="overlay">
+    <div class="register-box">
+        <div class="register-header">
+            <header>Sign Up</header>
+            <button class="close-btn" id="close-register">&times;</button>
+        </div>
+
+        <form method="POST" action="{% url 'register' %}" class="register-form">
+            {% csrf_token %}
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+
+            <!-- Username Input -->
+            <div class="input-box">
+                <label for="username" class="sr-only">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="input-field" 
+                    placeholder="Enter your username" 
+                    required 
+                    autocomplete="off"
+                >
+            </div>
+
+            <!-- Email Input -->
+            <div class="input-box">
+                <label for="email" class="sr-only">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="input-field" 
+                    placeholder="Enter your email" 
+                    required 
+                    autocomplete="off"
+                >
+            </div>
+
+            <!-- Password Input -->
+            <div class="input-box">
+                <label for="password" class="sr-only">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="input-field" 
+                    placeholder="Enter your password" 
+                    required 
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <!-- Confirm Password Input -->
+            <div class="input-box">
+                <label for="confirm_password" class="sr-only">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirm_password" 
+                    name="confirm_password" 
+                    class="input-field" 
+                    placeholder="Confirm your password" 
+                    required 
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <!-- Submit Button -->
+            <div class="input-submit">
+                <button type="submit" class="submit-btn" id="submit">
+                    Register
+                </button>
+            </div>
+
+            <!-- Login Link -->
+            <div class="login-link">
+                <p>Already have an account? <a href="{% url 'login' %}" class="login-link-text">Login</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript for Validation -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('.register-form');
+        const errorElement = document.querySelector('.error');
+
+        form.addEventListener('submit', (event) => {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirm_password').value.trim();
+
+            // Check if all fields are filled
+            if (!username || !email || !password || !confirmPassword) {
+                event.preventDefault(); // Prevent form submission
+                errorElement.textContent = 'Please fill in all fields.';
+                return;
+            }
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                event.preventDefault(); // Prevent form submission
+                errorElement.textContent = 'Passwords do not match.';
+                return;
+            }
+
+            // Clear error message if valid
+            errorElement.textContent = '';
+        });
+
+        // Close overlay
+        const closeBtn = document.getElementById('close-register');
+        closeBtn.addEventListener('click', () => {
+            const overlay = document.querySelector('.overlay');
+            overlay.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}

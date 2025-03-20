@@ -1,0 +1,20 @@
+{% extends "backend/base.html" %}
+
+{% block title %}Plant Details{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <img src="{{ plant.image.url }}" class="card-img-top" alt="{{ plant.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ plant.name }}</h5>
+                    <p class="card-text">{{ plant.description }}</p>
+                    <p><strong>Scientific Name:</strong> {{ plant.scientific_name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

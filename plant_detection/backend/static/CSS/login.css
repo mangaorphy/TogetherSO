@@ -1,0 +1,139 @@
+/* Overlay Styling */
+.overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8); /* Slightly faded white background */
+    backdrop-filter: blur(5px); /* Blur the underlying content */
+    z-index: 1000; /* Ensure it appears above other content */
+}
+
+/* Register Box */
+.register-box {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    max-width: 100%;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styling */
+.register-header header {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    color: #043610; /* Match gradient theme */
+    margin-bottom: 20px;
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #666;
+}
+
+.close-btn:hover {
+    color: #4ECC5A; /* Match theme */
+}
+
+/* Input Box Styling */
+.input-box {
+    margin-bottom: 15px;
+}
+
+.input-box .input-field {
+    width: 100%;
+    height: 50px;
+    padding: 0 15px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.input-box .input-field:focus {
+    border-color: #4ECC5A; /* Highlight on focus */
+    box-shadow: 0 0 5px rgba(78, 204, 90, 0.3);
+}
+
+/* Error Message */
+.error {
+    font-size: 14px;
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Submit Button */
+.input-submit .submit-btn {
+    width: 100%;
+    height: 50px;
+    background: #4ECC5A;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.input-submit .submit-btn:hover {
+    background: #043610; /* Darker shade on hover */
+    transform: scale(1.05); /* Slight enlargement */
+}
+
+/* Login Link */
+.login-link {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 20px;
+    color: #666;
+}
+
+.login-link a {
+    color: #4ECC5A; /* Match theme */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .register-box {
+        width: 90%; /* Adjust width for smaller screens */
+        padding: 20px;
+    }
+
+    .register-header header {
+        font-size: 1.75rem;
+    }
+
+    .input-box .input-field {
+        height: 45px;
+        font-size: 14px;
+    }
+
+    .input-submit .submit-btn {
+        height: 45px;
+        font-size: 14px;
+    }
+}

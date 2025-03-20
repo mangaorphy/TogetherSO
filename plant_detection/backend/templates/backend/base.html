@@ -1,0 +1,316 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Togetherso - Orpheus Manga</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="images/harely-davidson-logo.ico" type="image/x-icon">
+    <!-- Google Font Family -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Poppins:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/e768f44d60.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap Css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+           <!-- Custom CSS Block -->
+    {% block extrahead %}{% endblock %}
+    <style>
+        *{margin: 0;padding: 0;}
+        body{
+            font-family: 'Poppins', sans-serif;
+            {% comment %} background-image: url("{% static 'images/background-plants.jpg' %}"); {% endcomment %}
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed; 
+        }
+        .back-top{
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            font-size: 25px;width: 40px ;height: 40px;
+            background-color: #333;
+            color: #ddd;
+            border-radius: 50%;text-align: center;
+        }
+        .logo-text{
+            font-size: 40px;
+            font-family: 'Berkshire Swash',cursive;
+        }
+        .logo-dot{
+            font-size: 40px;
+            margin-left: 3px;
+            color: #4eda4e;
+        }
+        .primary-color{
+            background-color: #333;
+        }
+        .single-shop{
+            background-color: #555;
+        }
+        
+        img{
+            transition: .5s;
+        }
+        img:hover{
+            transform: scale(1.05);
+        }
+        
+        .client-section{
+            background-color: #333;
+        }
+        .single-card {
+            background-color: #555;
+        }
+        #features{
+            background-image: url(../static/images/background_image.png);
+        }
+        .slider-img {
+            height: 85vh;
+            background-image: url(images/awesomebike.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: left;
+        }
+        .slide-wrap{
+            width: 60%;;
+        }
+        .slide-details{
+            color: #ddd
+        }
+        .about-harley-box{
+            background-color: #0D0925;
+        }
+        .frequent-box{
+            background-color: #222;
+        }
+        /* ---------------- */
+          a {
+              color: #ddd;
+              text-decoration: none;
+              display: block;
+          }
+        
+          h1 {
+              color: #0D0925;
+          }
+        
+          p {
+              color: #6C6C6C;
+          }
+        
+          .btn:focus,
+          .form-control:focus {
+              outline: none;
+              box-shadow: none;
+          }
+        
+          .small-border-p::after,
+          .small-border::after {
+              content: "";
+              background-color: rgba(231, 111, 81, 0.5);
+              width: 100px;
+              height: 2px;
+              position: absolute;
+              top: 110px;
+              left: 0;
+              right: 0;
+              margin: auto;
+          }
+        
+          .small-border-p::after {
+              top: 30px;
+          }
+        
+          .text-color {
+              color: #E76F51;
+          }
+        
+          .text-second {
+              color: #264653;
+          }
+        
+          .bg-main {
+              background-color: #E76F51;
+          }
+        
+          .bg-gray {
+              background-color: rgba(128, 128, 128, 0.2);
+          }
+    </style>
+
+</head>
+
+<body>
+
+
+    <!-- header started
+------------------------------- -->
+    <header class="text-white" id="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href={% url 'home' %}><span class="logo-text">TogetherSo<sup
+                            class="logo-dot">.</sup></span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <div class="d-flex me-auto"> </div>
+                    <ul class="navbar-nav mb-2 mb-lg-0 text-center">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href={% url 'home' %}>Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'services' %}">Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">News</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Contact Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="py-lg-3 d-lg-flex .d-md-block slider-img">
+            <div class="container d-lg-flex align-items-center .d-md-block">
+                <div class="slide-wrap">
+                    <p style="color:rgb(151, 25, 25);">Detect Earrly, Protect Always</p>
+                    <h1 class="fw-bold text-success slide-title">TogetherSO, DETECT EARLY, PROTECT ALWAYS</h1>
+                    <p class="slide-details text-success">
+                        One of the major causes of reduced crop yields is mainly due to diseases, and it's difficult to identify them before they damage the plants. With the help of <span class="fw-bold">TogetherSO</span>, we can all <span class="fw-bold text-success">Quickly identify</span> them before they damage our crops.
+                    </p>                    
+
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModalToggle" aria-hidden="true"
+                        aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalToggleLabel">Modal 1</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-second">
+                                    <h1 class="fs-2">Are you sure want to By Harely Davidson??</h1>
+                                    <span class="fs-4">Its $23,000 </span>
+                                </div>
+                                <div class="modal-footer text-second">
+                                    <button class="btn btn-primary" data-bs-target="#exampleModalToggle2"
+                                        data-bs-toggle="modal" data-bs-dismiss="modal">Buy Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="exampleModalToggle2" aria-hidden="true"
+                        aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalToggleLabel2">Modal 2</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-second">
+                                    <h1 class="fs-3">Its Processing</h1>
+                                </div>
+                                <div class="modal-footer text-second">
+                                    <button class="btn btn-primary" data-bs-target="#exampleModalToggle"
+                                        data-bs-toggle="modal" data-bs-dismiss="modal">Back to first</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary px-4 py-2 border-0" style="background-color: #E76F51;"
+                        data-bs-toggle="modal" href="#exampleModalToggle" role="button"> Purchase <i
+                            class="fas fa-shopping-cart"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mt-5">
+        {% block content %}
+        <!-- Dynamic content goes here -->
+        {% endblock %}
+    </main>
+
+
+    <!-- Footer Section
+    ---------------------------- -->
+    <footer class="py-5" style="background-color: #0B0D17;">
+        <div class="container ">
+            <div class="d-lg-flex justify-content-between align-items-center text-white">
+                <div class="">
+                    <div class="d-flex">
+                        <a class="me-3" href="#">Downloads</a>
+                        <a class="me-3" href="#">License</a>
+                    </div>
+                    <div class="d-flex">
+                        <a class="me-3 my-3" href="#">About</a>
+                        <a class="me-3 my-3" href="#">Pricing</a>
+                        <a class="me-3 my-3" href="#">Careers</a>
+                        <a class="me-3 my-3" href="#">Help</a>
+                    </div>
+                    <div class="my-3">
+                        <span class="tt-uppercase">&copy2025 all rights reserved by manga Orpheus</span>
+                    </div>
+                </div>
+                <div class="">
+                    <h4>Get the App</h4>
+                    <img src="{% static 'images/app-store.png' %}" class="img-fluid d-block rounded my-3" style="width: 50%;" alt="">
+                    <img src="{% static 'images/play-store.png' %}" class="img-fluid d-block rounded my-3" style="width: 50%;" alt="">
+                </div>
+                
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+        <script>
+            let lastScrollTop = 0;
+            const navbar = document.querySelector(".navbar");
+        
+            window.addEventListener("scroll", function () {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+                if (scrollTop < lastScrollTop) {
+                    navbar.classList.add("bg-success");
+                    navbar.classList.remove("bg-dark");
+                } else {
+                    navbar.classList.add("bg-dark");
+                    navbar.classList.remove("bg-success");
+                }
+                lastScrollTop = scrollTop;
+            });
+        </script>
+        
+</body>
+
+</html>

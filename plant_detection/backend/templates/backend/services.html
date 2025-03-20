@@ -1,0 +1,176 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block pagetitle %}
+AI Engine
+{% endblock pagetitle %}
+
+{% block extrahead %}
+<!-- Link to CSS File -->
+<link rel="stylesheet" href="{% static 'CSS/services.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="detection-section py-5">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="row mb-5 text-center text-white">
+            <div class="col-lg-10 mx-auto">
+                <h1 class="display-4 fw-bold text-success">
+                    🍀 PLANTGUARD AI 🍀
+                </h1>
+                <p class="lead text-muted">
+                    Let our AI engine help you detect plant diseases quickly and accurately.
+                </p>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card bg-light shadow rounded-lg p-4 h-100">
+                    <h5 class="card-title text-center fw-bold">Why Detect Plant Diseases?</h5>
+                    <p class="card-text text-muted">
+                        Plant diseases affect the growth of their respective species. Early detection ensures transparency and prevents losses. Proper disease diagnosis is crucial for effective control measures.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-light shadow rounded-lg p-4 h-100">
+                    <img 
+                        src="https://www.pngjoy.com/pngl/250/4840262_plants-png-indoors-tropical-plant-png-hd-png.png" 
+                        class="img-fluid d-block mx-auto mb-4 rounded-pill" 
+                        alt="Plant Leaf"
+                    >
+                    <form action="{% url 'submit' %}" method="POST" enctype="multipart/form-data" class="upload-form">
+                        {% csrf_token %}
+                        <h5 class="text-center fw-bold">Upload Plant Leaf Image</h5>
+                    
+                        <!-- Image Preview Section -->
+                        <div class="mb-3 text-center">
+                            <img 
+                                id="image-preview" 
+                                src="{{ plant.image.url }}" 
+                                alt="Preview of Selected Image" 
+                                class="img-fluid rounded mb-3" 
+                                style="max-width: 100%; height: auto; display: none;"
+                            >
+                        </div>
+                    
+                        <!-- File Upload Section -->
+                        <div class="input-group mb-3">
+                            <input 
+                                type="file" 
+                                id="actual-btn" 
+                                name="image" 
+                                class="form-control" 
+                                accept="image/*" 
+                                onchange="previewImage(this)" 
+                            />
+                            <label for="actual-btn" class="input-group-text bg-success text-white">
+                                <i class="fas fa-upload me-2"></i> Choose File
+                            </label>
+                            <span id="file-chosen" class="form-control text-muted">No file chosen</span>
+                        </div>
+                    
+                        <!-- Camera Input Section -->
+                        <div class="input-group mb-3">
+                            <input 
+                                type="file" 
+                                id="camera-btn" 
+                                name="image" 
+                                class="form-control" 
+                                accept="image/*" 
+                                capture="camera" 
+                                onchange="previewImage(this)" 
+                            />
+                            <label for="camera-btn" class="input-group-text bg-success text-white">
+                                <i class="fas fa-camera me-2"></i> Take Picture
+                            </label>
+                            <span id="camera-file-chosen" class="form-control text-muted">No picture taken</span>
+                        </div>
+                    
+                        <p class="text-center text-muted">
+                            Simply upload your plant's leaf image or take a picture using your camera, and see the magic of AI in detecting diseases.
+                        </p>
+                    
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success px-4 py-2">
+                                <i class="fas fa-check-circle me-2"></i> Analyze Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-light shadow rounded-lg p-4 h-100">
+                    <h5 class="card-title text-center fw-bold">Prevent Plant Diseases</h5>
+                    <ol class="list-unstyled text-muted">
+                        <li>Follow good sanitation practices.</li>
+                        <li>Fertilize to keep your plants healthy.</li>
+                        <li>Inspect plants for diseases before bringing them home.</li>
+                        <li>Allow the soil to warm before planting.</li>
+                        <li>Rotate crops for a healthier vegetable garden.</li>
+                        <li>Provide good air circulation.</li>
+                        <li>Remove diseased stems and foliage promptly.</li>
+                    </ol>
+                    <a href="https://www.thespruce.com/prevent-plant-diseases-in-your-garden-2539511" target="_blank" class="btn btn-outline-success w-100 mt-3">
+                        <i class="fas fa-info-circle me-2"></i> More Info
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const actualBtn = document.getElementById('actual-btn');
+    const fileChosen = document.getElementById('file-chosen');
+
+    // Update the file name when a file is selected
+    actualBtn.addEventListener('change', function () {
+        if (this.files.length > 0) {
+            fileChosen.textContent = this.files[0].name;
+        } else {
+            fileChosen.textContent = 'No file chosen';
+        }
+    });
+</script>
+
+<!-- JavaScript for Image Preview and File Handling -->
+<script>
+    function previewImage(input) {
+        const preview = document.getElementById('image-preview');
+        const fileChosen = document.getElementById('file-chosen');
+        const cameraFileChosen = document.getElementById('camera-file-chosen');
+
+        // Check if an image was selected
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block'; // Show the preview image
+            };
+
+            reader.readAsDataURL(input.files[0]);
+
+            // Update the "file chosen" text
+            if (input.id === 'actual-btn') {
+                fileChosen.textContent = input.files[0].name;
+                cameraFileChosen.textContent = 'No picture taken';
+            } else if (input.id === 'camera-btn') {
+                cameraFileChosen.textContent = input.files[0].name;
+                fileChosen.textContent = 'No file chosen';
+            }
+        } else {
+            // Reset the preview if no file is selected
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+    }
+</script>
+
+{% endblock content %}

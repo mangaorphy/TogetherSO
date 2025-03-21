@@ -127,13 +127,31 @@
         </div>
 
         <div class="row align-items-center">
-            <div class="col-md-6 order-md-2">
-                <video 
+            <div class="col-md-6 order-md-2 position-relative">
+                <!-- Placeholder Image -->
+                <img 
+                    src="{% static 'images/plant-detection-demo.jpg' %}" 
+                    alt="Plant Disease Detection Demo" 
                     class="w-100 rounded shadow-lg" 
-                    controls 
-                    poster="{% static 'images/plant-detection-demo.jpg' %}">
-                    <source src="{% static 'video/disease-detection-demo.mp4' %}" type="video/mp4">
-                </video>
+                    style="cursor: pointer;"
+                >
+                <!-- Hidden YouTube Video -->
+                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none;" id="youtube-video-container">
+                    <div class="ratio ratio-16x9 rounded shadow-lg">
+                        <iframe 
+                            src="https://www.youtube.com/embed/OtiqxEaNY2o?si=FZiD5f_zU1084SNq&autoplay=1" 
+                            title="YouTube Video Player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            
+                <!-- Play Button Overlay -->
+                <div class="position-absolute top-50 start-50 translate-middle" style="cursor: pointer;" onclick="showVideo()">
+                    <i class="fas fa-play fa-3x text-success"></i>
+                </div>
             </div>
             <div class="col-md-6 order-md-1">
                 <h3 class="fw-bold mb-3">Why Choose TogetherSO?</h3>
@@ -160,154 +178,6 @@
     </div>
 </section>
 
-<!-- Happy Clients Section -->
-<section class="client-section" style="background-color: #f8f9fa;">
-    <div class="container">
-        <div class="text-center">
-            <h1 class="text-center fw-bold py-5 position-relative">
-                Happy <span style="color: #4CAF50;">Farmers Say</span>
-                <span class="small-border" style="background-color: #4CAF50;"></span>
-            </h1>
-        </div>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- Single Card -->
-            <div class="col text-center">
-                <div class="card h-100 py-3 single-card" style="background-color: #ffffff; border: 1px solid #e0e0e0;">
-                    <img src="{% static 'images/farmer-1.jpg' %}" class="card-img-top img-fluid p-3 mx-auto rounded-circle" style="width: 50%;" alt="Farmer 1">
-                    <div class="card-body">
-                        <p class="card-text text-center">"TogetherSO has transformed how I manage my crops. Early disease detection has saved me time and money!"</p>
-                    </div>
-                    <div class="text-center">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-secondary"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">John K.</h5>
-                    <span class="fw-bold" style="color: #4CAF50;">Coffee Farmer</span>
-                </div>
-            </div>
-            <!-- Single Card -->
-            <div class="col text-center">
-                <div class="card h-100 py-3 single-card" style="background-color: #ffffff; border: 1px solid #e0e0e0;">
-                    <img src="{% static 'images/farmer-2.jpg' %}" class="card-img-top img-fluid p-3 mx-auto rounded-circle" style="width: 50%;" alt="Farmer 2">
-                    <div class="card-body">
-                        <p class="card-text text-center">"The AI-powered disease detection is incredibly accurate. My yields have improved significantly!"</p>
-                    </div>
-                    <div class="text-center">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Mary W.</h5>
-                    <span class="fw-bold" style="color: #4CAF50;">Maize Farmer</span>
-                </div>
-            </div>
-            <!-- Single Card -->
-            <div class="col text-center">
-                <div class="card h-100 py-3 single-card" style="background-color: #ffffff; border: 1px solid #e0e0e0;">
-                    <img src="{% static 'images/farmer-3.jpg' %}" class="card-img-top img-fluid p-3 mx-auto rounded-circle" style="width: 50%;" alt="Farmer 3">
-                    <div class="card-body">
-                        <p class="card-text text-center">"I love how easy it is to use. The recommendations are practical and effective."</p>
-                    </div>
-                    <div class="text-center">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Peter M.</h5>
-                    <span class="fw-bold" style="color: #4CAF50;">Vegetable Farmer</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Frequently Asked Questions Section -->
-<section class="frequent-box" style="background-color: #f8f9fa;">
-    <div class="container">
-        <div>
-            <h1 class="text-center fw-bold py-5 position-relative">
-                Frequently Asked <span style="color: #4CAF50;">Questions</span>
-                <span class="small-border" style="background-color: #4CAF50;"></span>
-            </h1>
-        </div>
-        <div class="row g-3">
-            <div class="col-sm-12 col-md-6 col-lg-6">
-                <img src="{% static 'images/faq.png' %}" alt="FAQ Image" class="img-fluid">
-            </div>
-            <div class="col-sm-12 col-md-6 col-lg-6">
-                <div class="accordion" id="accordionPanelsStayOpenExample">
-                    <div class="accordion-item my-3">
-                        <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
-                                aria-controls="panelsStayOpen-collapseOne">
-                                <i class="fas fa-seedling me-2" style="color: #4CAF50;"></i> What are the most important things I should know about plant diseases?
-                            </button>
-                        </h2>
-                        <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show"
-                            aria-labelledby="panelsStayOpen-headingOne">
-                            <div class="accordion-body">
-                                Early detection is key! Always monitor your plants for signs of disease, such as discoloration, spots, or wilting. Use tools like TogetherSO to diagnose issues quickly and accurately.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item my-3">
-                        <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
-                                aria-controls="panelsStayOpen-collapseTwo">
-                                <i class="fas fa-tractor me-2" style="color: #4CAF50;"></i> How can I prevent plant diseases?
-                            </button>
-                        </h2>
-                        <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse"
-                            aria-labelledby="panelsStayOpen-headingTwo">
-                            <div class="accordion-body">
-                                Follow good sanitation practices, rotate crops, and ensure proper air circulation. Regularly inspect your plants and use disease-resistant varieties when possible.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item my-3">
-                        <h2 class="accordion-header" id="panelsStayOpen-headingThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
-                                aria-controls="panelsStayOpen-collapseThree">
-                                <i class="fas fa-leaf me-2" style="color: #4CAF50;"></i> Can TogetherSO detect all plant diseases?
-                            </button>
-                        </h2>
-                        <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse"
-                            aria-labelledby="panelsStayOpen-headingThree">
-                            <div class="accordion-body">
-                                TogetherSO is trained to detect a wide range of plant diseases. However, if you encounter an issue not covered by our platform, please contact our support team for assistance.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item my-3">
-                        <h2 class="accordion-header" id="panelsStayOpen-headingFour">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false"
-                                aria-controls="panelsStayOpen-collapseFour">
-                                <i class="fas fa-wifi me-2" style="color: #4CAF50;"></i> Do I need internet access to use TogetherSO?
-                            </button>
-                        </h2>
-                        <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse"
-                            aria-labelledby="panelsStayOpen-headingFour">
-                            <div class="accordion-body">
-                                While some features work offline, the AI-powered disease detection requires an active internet connection to process images and provide results.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- Back to Top Button -->
 <a href="#featured-plants" class="back-top"><i class="fas fa-chevron-up"></i></a>

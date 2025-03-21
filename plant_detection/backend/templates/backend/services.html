@@ -1,100 +1,75 @@
 {% extends 'backend/base.html' %}
-{% load static %}
-
 {% block pagetitle %}
 AI Engine
 {% endblock pagetitle %}
 
-{% block extrahead %}
-<!-- Link to CSS File -->
-<link rel="stylesheet" href="{% static 'CSS/services.css' %}">
-{% endblock %}
-
 {% block content %}
-<div class="detection-section py-5">
+<div>
     <div class="container">
         <!-- Header Section -->
         <div class="row mb-5 text-center text-white">
             <div class="col-lg-10 mx-auto">
-                <h1 class="display-4 fw-bold text-success">
-                    🍀 PLANTGUARD AI 🍀
+                <h1 class="display-4" style="padding-top: 2%; font-weight: 400; color: rgb(4, 54, 4);">
+                    <b>🍀 PLANTGUARD AI 🍀</b>
                 </h1>
-                <p class="lead text-muted">
-                    Let our AI engine help you detect plant diseases quickly and accurately.
+                <p class="lead" style="font-weight: 500; color: black;">
+                    Let AI Engine Help You Detect Plant Diseases
                 </p>
             </div>
         </div>
 
-        <!-- Upload Section -->
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card bg-light shadow rounded-lg p-4 h-100">
-                    <h5 class="card-title text-center fw-bold">Why Detect Plant Diseases?</h5>
-                    <p class="card-text text-muted">
-                        Plant diseases affect the growth of their respective species. Early detection ensures transparency and prevents losses. Proper disease diagnosis is crucial for effective control measures.
+        <!-- Content Section -->
+        <div class="row">
+            <!-- Why Detect Diseases? -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="p-5 bg-white shadow rounded-lg h-100">
+                    <h5 class="mb-4"><b>Why is it necessary to detect diseases in plants?</b></h5>
+                    <p class="text-muted">
+                        Plant diseases affect the growth of their respective species. Proper disease diagnosis is crucial
+                        to prevent further plant losses and ensure effective control measures. Early detection can save
+                        time, money, and crops.
                     </p>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card bg-light shadow rounded-lg p-4 h-100">
-                    <img 
-                        src="https://www.pngjoy.com/pngl/250/4840262_plants-png-indoors-tropical-plant-png-hd-png.png" 
-                        class="img-fluid d-block mx-auto mb-4 rounded-pill" 
-                        alt="Plant Leaf"
-                    >
+            <!-- Image Upload Section -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="p-5 bg-white shadow rounded-lg h-100">
+
+                    <!-- File Upload Form -->
                     <form action="{% url 'submit' %}" method="POST" enctype="multipart/form-data" class="upload-form">
                         {% csrf_token %}
                         <h5 class="text-center fw-bold">Upload Plant Leaf Image</h5>
                     
                         <!-- Image Preview Section -->
-                        <div class="mb-3 text-center">
-                            <img 
-                                id="image-preview" 
-                                src="{{ plant.image.url }}" 
-                                alt="Preview of Selected Image" 
-                                class="img-fluid rounded mb-3" 
-                                style="max-width: 100%; height: auto; display: none;"
-                            >
+                        <div class="text-center mb-3">
+                            <img id="image-preview" src="#" alt="Image Preview" class="img-fluid rounded" style="max-height: 300px; display: none;">
                         </div>
                     
-                        <!-- File Upload Section -->
+                        <!-- File Upload Input -->
                         <div class="input-group mb-3">
-                            <input 
-                                type="file" 
-                                id="actual-btn" 
-                                name="image" 
-                                class="form-control" 
-                                accept="image/*" 
-                                onchange="previewImage(this)" 
-                            />
+                            <input type="file" id="actual-btn" name="image" class="form-control" hidden accept="image/*" />
                             <label for="actual-btn" class="input-group-text bg-success text-white">
                                 <i class="fas fa-upload me-2"></i> Choose File
                             </label>
                             <span id="file-chosen" class="form-control text-muted">No file chosen</span>
                         </div>
                     
-                        <!-- Camera Input Section -->
+                        <!-- Camera Capture Input -->
                         <div class="input-group mb-3">
-                            <input 
-                                type="file" 
-                                id="camera-btn" 
-                                name="image" 
-                                class="form-control" 
-                                accept="image/*" 
-                                capture="camera" 
-                                onchange="previewImage(this)" 
-                            />
-                            <label for="camera-btn" class="input-group-text bg-success text-white">
-                                <i class="fas fa-camera me-2"></i> Take Picture
+                            <input type="file" id="camera-input" name="image" class="form-control" hidden accept="image/*" capture="environment" />
+                            <label for="camera-input" class="input-group-text bg-primary text-white">
+                                <i class="fas fa-camera me-2"></i> Take Photo
                             </label>
-                            <span id="camera-file-chosen" class="form-control text-muted">No picture taken</span>
+                            <span id="camera-chosen" class="form-control text-muted">No photo taken</span>
                         </div>
                     
+                        <!-- Description -->
                         <p class="text-center text-muted">
-                            Simply upload your plant's leaf image or take a picture using your camera, and see the magic of AI in detecting diseases.
+                            Simply upload your plant's leaf image or take a photo to detect diseases using AI.
                         </p>
                     
+                        <!-- Submit Button -->
                         <div class="text-center">
                             <button type="submit" class="btn btn-success px-4 py-2">
                                 <i class="fas fa-check-circle me-2"></i> Analyze Now
@@ -104,20 +79,22 @@ AI Engine
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card bg-light shadow rounded-lg p-4 h-100">
-                    <h5 class="card-title text-center fw-bold">Prevent Plant Diseases</h5>
-                    <ol class="list-unstyled text-muted">
-                        <li>Follow good sanitation practices.</li>
-                        <li>Fertilize to keep your plants healthy.</li>
-                        <li>Inspect plants for diseases before bringing them home.</li>
-                        <li>Allow the soil to warm before planting.</li>
-                        <li>Rotate crops for a healthier vegetable garden.</li>
-                        <li>Provide good air circulation.</li>
-                        <li>Remove diseased stems and foliage promptly.</li>
+            <!-- Prevention Tips -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="p-5 bg-white shadow rounded-lg h-100">
+                    <h5 class="mb-4"><b>Prevent Plant Diseases</b></h5>
+                    <ol class="text-muted">
+                        <li>Follow Good Sanitation Practices.</li>
+                        <li>Fertilize to Keep Your Plants Healthy.</li>
+                        <li>Inspect Plants for Diseases Before You Bring Them Home.</li>
+                        <li>Allow the Soil to Warm Before Planting.</li>
+                        <li>Ensure a Healthy Vegetable Garden By Rotating Crops.</li>
+                        <li>Provide Good Air Circulation.</li>
+                        <li>Remove Diseased Stems and Foliage.</li>
                     </ol>
-                    <a href="https://www.thespruce.com/prevent-plant-diseases-in-your-garden-2539511" target="_blank" class="btn btn-outline-success w-100 mt-3">
-                        <i class="fas fa-info-circle me-2"></i> More Info
+                    <a target="_blank" href="https://www.thespruce.com/prevent-plant-diseases-in-your-garden-2539511"
+                        class="btn btn-outline-success btn-block">
+                        <i class="fas fa-info-circle"></i> More Info
                     </a>
                 </div>
             </div>
@@ -125,11 +102,11 @@ AI Engine
     </div>
 </div>
 
+<!-- JavaScript for File Upload -->
 <script>
     const actualBtn = document.getElementById('actual-btn');
     const fileChosen = document.getElementById('file-chosen');
 
-    // Update the file name when a file is selected
     actualBtn.addEventListener('change', function () {
         if (this.files.length > 0) {
             fileChosen.textContent = this.files[0].name;
@@ -141,36 +118,42 @@ AI Engine
 
 <!-- JavaScript for Image Preview and File Handling -->
 <script>
-    function previewImage(input) {
-        const preview = document.getElementById('image-preview');
-        const fileChosen = document.getElementById('file-chosen');
-        const cameraFileChosen = document.getElementById('camera-file-chosen');
+    // Handle file input for "Choose File"
+    const imagePreview = document.getElementById('image-preview');
 
-        // Check if an image was selected
-        if (input.files && input.files[0]) {
+    actualBtn.addEventListener('change', function () {
+        if (this.files.length > 0) {
+            fileChosen.textContent = this.files[0].name;
             const reader = new FileReader();
-
             reader.onload = function (e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block'; // Show the preview image
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
             };
-
-            reader.readAsDataURL(input.files[0]);
-
-            // Update the "file chosen" text
-            if (input.id === 'actual-btn') {
-                fileChosen.textContent = input.files[0].name;
-                cameraFileChosen.textContent = 'No picture taken';
-            } else if (input.id === 'camera-btn') {
-                cameraFileChosen.textContent = input.files[0].name;
-                fileChosen.textContent = 'No file chosen';
-            }
+            reader.readAsDataURL(this.files[0]);
         } else {
-            // Reset the preview if no file is selected
-            preview.src = '#';
-            preview.style.display = 'none';
+            fileChosen.textContent = 'No file chosen';
+            imagePreview.style.display = 'none';
         }
-    }
+    });
+
+    // Handle file input for "Take Photo"
+    const cameraInput = document.getElementById('camera-input');
+    const cameraChosen = document.getElementById('camera-chosen');
+
+    cameraInput.addEventListener('change', function () {
+        if (this.files.length > 0) {
+            cameraChosen.textContent = this.files[0].name;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(this.files[0]);
+        } else {
+            cameraChosen.textContent = 'No photo taken';
+            imagePreview.style.display = 'none';
+        }
+    });
 </script>
 
 {% endblock content %}

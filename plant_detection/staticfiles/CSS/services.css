@@ -1,0 +1,87 @@
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Detection Section */
+.detection-section {
+    background: linear-gradient(to right, #4ECC5A, #043610);
+    color: #fff;
+}
+
+/* Cards */
+.card {
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* File Upload Input Group */
+.input-group {
+    justify-content: center;
+    align-items: center;
+}
+
+.input-group-text {
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* File Chosen Span */
+#file-chosen {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+}
+
+/* Buttons */
+.btn-success {
+    background-color: #4ECC5A;
+    border-color: #4ECC5A;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background-color: #043610;
+    border-color: #043610;
+}
+
+/* More Info Button */
+.btn-outline-success {
+    color: #4ECC5A;
+    border-color: #4ECC5A;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-success:hover {
+    color: #fff;
+    background-color: #4ECC5A;
+    border-color: #4ECC5A;
+}
+
+/* Icons */
+.fas {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .detection-section .row {
+        flex-direction: column;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+}

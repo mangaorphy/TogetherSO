@@ -85,6 +85,20 @@ DATABASES = {
     }
 }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'TogetherSO',  # Database name
+        'USER': 'root',  # MySQL username
+        'PASSWORD': 'Seuphro44#',  # MySQL password
+        'HOST': '127.0.0.1',  # MySQL host
+        'PORT': '3306',  # MySQL port (default is 3306)
+        'OPTIONS': {
+            'unix_socket': '/var/run/mysqld/mysqld.sock',  # Update this path based on mysql_config output
+        },
+    }
+}
+
 # AUTHENTICATION_BACKENDS = [
 #     'axes.backends.AxesStandaloneBackend',  
 #     'django.contrib.auth.backends.ModelBackend',

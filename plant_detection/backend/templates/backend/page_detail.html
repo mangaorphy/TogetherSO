@@ -1,0 +1,38 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Page Content -->
+<section class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            <!-- Title Section -->
+            <h1 class="fw-bold mb-4" style="color: #043610;">{{ page.title }}</h1>
+            <div class="border-bottom w-25 mx-auto" style="background-color: #4CAF50; height: 3px; margin-bottom: 30px;"></div>
+
+            <!-- Content Card -->
+            <div class="card shadow p-4 bg-light" style="border-radius: 10px;">
+                <!-- Image Section (Optional) -->
+                {% if page.image_url %}
+                <img src="{{ page.image_url }}" alt="{{ page.title }} Image" class="img-fluid rounded mb-4" style="max-width: 100%; height: auto; border: 2px solid #ddd; border-radius: 8px;">
+                {% endif %}
+
+                <!-- Content Section -->
+                <div class="card-body">
+                    <p class="lead text-muted">{{ page.content|linebreaks }}</p>
+                </div>
+
+                <!-- Action Button (Optional) -->
+                {% if page.action_link %}
+                <div class="text-center mt-4">
+                    <a href="{{ page.action_link }}" class="btn btn-success px-4 py-2" style="font-size: 1rem;">
+                        {{ page.action_text|default:"Learn More" }}
+                        <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

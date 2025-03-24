@@ -1,84 +1,71 @@
 {% extends "backend/base.html" %}
 {% load static %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard | TogetherSO{% endblock %}
+
+{% block extrahead %}
+<!-- Link to Chart.js for graph visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="{% static 'CSS/dashboard.css' %}">
+{% endblock %}
 
 {% block content %}
 <style>
+  /* General Reset */
   body {
     overflow-x: hidden;
+    font-family: 'Poppins', sans-serif;
   }
-  @media only screen and (max-width: 830px) {
-    .laptop {
-      display: none;
-    }
-  }
-  @media (min-width: 830px) and (max-width: 1536px) {
-    .mobile {
-      display: none;
-    }
-  }
-  .dashboard-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-  }
-  .dashboard-card:hover {
-    transform: translateY(-5px);
-  }
-  .card-title {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #333;
-  }
-  .card-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #4CAF50;
-  }
+
+  /* Dashboard Header */
   #dashboard-header {
     background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url("{% static 'images/background-plants.jpg' %}");
     background-size: cover;
     background-position: center;
     padding: 60px 0;
+    color: #fff;
   }
-  .section-title {
-    font-size: 2rem;
+
+  /* Dashboard Card Styling */
+  .dashboard-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .card-text {
+    font-size: 1.5rem;
     font-weight: bold;
-    color: #2c3e50;
-    margin-bottom: 20px;
+    color: #4CAF50;
   }
-  .section-subtitle {
-    font-size: 1.2rem;
-    color: #7f8c8d;
-    margin-bottom: 40px;
+
+  /* Graph Section */
+  .graph-section {
+    background-color: #f9f9f9;
+    padding: 40px 0;
   }
-  .border-bottom {
-    width: 50px;
-    height: 3px;
-    background-color: #4CAF50;
-    margin: 0 auto 20px;
+
+  .graph-container {
+    height: 300px;
   }
 </style>
-
-<!-- Mobile Warning -->
-<div class="mobile p-5">
-  <div class="row mb-5 text-center text-white">
-    <div class="col-lg-10 mx-auto">
-      <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color:red;"><b>Note✍🏻</b></h1>
-      <p class="lead" style="font-weight: 500;color: black;">Please🙏 Open This Site On Laptop/PC 💻 Screen Only</p>
-      <p class="lead" style="font-weight: 500;color: black;">Thank You 🤝</p>    
-    </div>
-  </div>
-</div>
-
 <!-- Dashboard Header -->
 <section id="dashboard-header" class="text-center laptop">
   <div class="container">
-    <h1 class="display-4 fw-bold" style="color: rgb(4, 54, 4);">Plant Disease Detection Dashboard</h1>
-    <p class="lead" style="color: black;">Monitor and manage plant health with real-time insights.</p>
-    <div class="border-bottom"></div>
+    <h1 class="display-4 fw-bold" style="color: #043610;">Plant Disease Detection Dashboard</h1>
+    <p class="lead">Monitor and manage plant health with real-time insights.</p>
+    <div class="border-bottom" style="background-color: #4CAF50;"></div>
   </div>
 </section>
 
@@ -122,13 +109,27 @@
   </div>
 </section>
 
+<!-- Trending Diseases Graph -->
+<section class="graph-section py-5 laptop">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold" style="color: #2c3e50;">Trending Diseases</h2>
+      <p class="lead" style="color: #7f8c8d;">Disease trends in your area over the past month</p>
+      <div class="border-bottom" style="background-color: #4CAF50;"></div>
+    </div>
+    <div class="graph-container">
+      <canvas id="trendingDiseasesChart"></canvas>
+    </div>
+  </div>
+</section>
+
 <!-- Recent Activity Section -->
 <section class="py-5 laptop">
   <div class="container">
     <div class="text-center mb-5">
-      <h2 class="section-title">Recent Activity</h2>
-      <p class="section-subtitle">Latest disease detection records</p>
-      <div class="border-bottom"></div>
+      <h2 class="fw-bold" style="color: #2c3e50;">Recent Activity</h2>
+      <p class="lead" style="color: #7f8c8d;">Latest disease detection records</p>
+      <div class="border-bottom" style="background-color: #4CAF50;"></div>
     </div>
     <div class="card dashboard-card">
       <div class="card-body">
@@ -142,15 +143,15 @@
           </thead>
           <tbody>
             {% for activity in recent_activity %}
-              <tr>
-                <td>{{ activity.name }}</td>
-                <td>{{ activity.plant.name }}</td>
-                <td>{{ activity.created_at|date:"Y-m-d" }}</td>
-              </tr>
+            <tr>
+              <td>{{ activity.disease.name }}</td>
+              <td>{{ activity.disease.plant.name }}</td>
+              <td>{{ activity.created_at|date:"Y-m-d" }}</td>
+            </tr>
             {% empty %}
-              <tr>
-                <td colspan="3" class="text-center">No recent activity</td>
-              </tr>
+            <tr>
+              <td colspan="3" class="text-center">No recent activity</td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>
@@ -163,9 +164,9 @@
 <section class="py-5 laptop">
   <div class="container">
     <div class="text-center mb-5">
-      <h2 class="section-title">Total Recommendations</h2>
-      <p class="section-subtitle">Actionable insights provided to farmers</p>
-      <div class="border-bottom"></div>
+      <h2 class="fw-bold" style="color: #2c3e50;">Total Recommendations</h2>
+      <p class="lead" style="color: #7f8c8d;">Actionable insights provided to farmers</p>
+      <div class="border-bottom" style="background-color: #4CAF50;"></div>
     </div>
     <div class="row justify-content-center">
       <div class="col-md-6">
@@ -178,5 +179,72 @@
     </div>
   </div>
 </section>
+
+<!-- JavaScript for Graph Visualization -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('trendingDiseasesChart').getContext('2d');
+
+    // Function to update the chart
+    function updateChart() {
+        fetch('/api/trending-diseases/')
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(item => item.disease_name);
+                const counts = data.map(item => item.count);
+
+                // Destroy existing chart before creating a new one
+                if (window.trendingChart) {
+                    window.trendingChart.destroy();
+                }
+
+                // Initialize Chart.js
+                window.trendingChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Trending Diseases',
+                            data: counts,
+                            backgroundColor: '#4CAF50',
+                            borderColor: '#043610',
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#ddd'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#333'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching trending diseases:', error));
+    }
+
+    // Initial load
+    updateChart();
+
+    // Periodically update the chart (e.g., every 30 seconds)
+    setInterval(updateChart, 30000);  // 30 seconds in milliseconds
+});
+</script>
 
 {% endblock %}

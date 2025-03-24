@@ -1,0 +1,122 @@
+{% extends "backend/base.html" %}
+{% load static %}
+
+{% block title %}Welcome to TogetherSO{% endblock %}
+
+{% block content %}
+<style>
+    /* Welcome Section Styling */
+    #welcome-section {
+        background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url("{% static 'images/farming-welcome.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        padding: 60px 0;
+        color: #333;
+    }
+
+    .welcome-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #043610;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.25rem;
+        line-height: 1.6;
+        color: #6c757d;
+    }
+
+    .btn-get-started {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-get-started:hover {
+        background-color: #043610;
+    }
+
+    .welcome-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+        padding: 20px;
+    }
+
+    .welcome-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+
+<!-- Welcome Section -->
+<section id="welcome-section" class="text-center">
+    <div class="container">
+        <h1 class="welcome-title">Welcome to TogetherSO</h1>
+        <p class="welcome-subtitle">
+            TogetherSO is an AI-powered platform designed to help farmers detect plant diseases early and protect their crops.
+        </p>
+        <div class="border-bottom w-25 mx-auto mt-3" style="background-color: #4CAF50; height: 3px;"></div>
+
+        <!-- Get Started Button -->
+        <div class="mt-5">
+            <a href="{% url 'register' %}" class="btn btn-get-started">
+                Get Started <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+        <!-- Key Features Section -->
+        <div class="row justify-content-center mt-5">
+            <!-- Early Detection Card -->
+            <div class="col-md-4 col-sm-6">
+                <div class="welcome-card p-4 text-center">
+                    <i class="fas fa-leaf fa-3x text-success mb-3"></i>
+                    <h5 class="fw-bold mb-3">Early Detection</h5>
+                    <p class="text-muted">
+                        Identify diseases in plants before they cause significant damage.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Crop Protection Card -->
+            <div class="col-md-4 col-sm-6">
+                <div class="welcome-card p-4 text-center">
+                    <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                    <h5 class="fw-bold mb-3">Protect Your Crops</h5>
+                    <p class="text-muted">
+                        Take action with our detailed recommendations for disease prevention.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Farmer-Friendly Card -->
+            <div class="col-md-4 col-sm-6">
+                <div class="welcome-card p-4 text-center">
+                    <i class="fas fa-users fa-3x text-success mb-3"></i>
+                    <h5 class="fw-bold mb-3">Farmer-Friendly</h5>
+                    <p class="text-muted">
+                        Designed specifically for farmers, TogetherSO is intuitive and easy to use.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call-to-Action Section -->
+        <div class="text-center mt-5">
+            <p class="lead">
+                Ready to empower your farming journey with advanced AI tools? 
+                Join thousands of farmers using TogetherSO today!
+            </p>
+            <a href="{% url 'register' %}" class="btn btn-get-started">
+                Create Account <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

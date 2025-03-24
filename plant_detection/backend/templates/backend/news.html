@@ -1,0 +1,80 @@
+{% extends "backend/base.html" %}
+{% load static %}
+
+{% block title %}News | TogetherSO{% endblock %}
+
+{% block content %}
+<style>
+    /* General Reset */
+    body {
+        overflow-x: hidden;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* News Section */
+    .news-section {
+        background-color: #f9f9f9;
+        padding: 40px 0;
+    }
+
+    .news-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+    }
+
+    .news-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .card-text {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+</style>
+
+<!-- News Header -->
+<section id="news-header" class="text-center py-5">
+    <div class="container">
+        <h1 class="fw-bold" style="color: #043610;">Latest News & Updates</h1>
+        <p class="lead">Stay informed about diseases affecting crops and how to take action.</p>
+        <div class="border-bottom" style="background-color: #4CAF50; width: 50px; height: 3px; margin: 0 auto 20px;"></div>
+    </div>
+</section>
+
+<!-- News Updates Section -->
+<section class="news-section">
+    <div class="container">
+        <div class="row g-4">
+            {% for update in news_updates %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card news-card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ update.title }}</h5>
+                        <p class="card-text">{{ update.content|truncatewords:30 }}</p>
+                        <a href="{% url 'disease-detail' update.disease.id %}" class="btn btn-success w-100">
+                            Learn More <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <small>Published on {{ update.created_at|date:"Y-m-d" }}</small>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="fs-4">No news updates available at this time.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

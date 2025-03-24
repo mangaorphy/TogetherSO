@@ -1,21 +1,37 @@
 import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import Farmer, Plant, Pest, Disease, Recommendation
+from .models import Farmer, Plant, Pest, Disease, Recommendation,DiseaseDetection, NewsUpdate, Page
+from .forms import DetectionForm, ContactForm
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import torch
 import torchvision.transforms.functional as TF
+from django.core.exceptions import ObjectDoesNotExist
 import numpy as np
 from PIL import Image
 from . import CNN
 from PIL import Image
+from django.db.models import Count
+from django.http import JsonResponse
+from django.utils.timezone import now
+from django.contrib import messages
 
 # Authentication views
+
+def welcome_view(request):
+    """
+    Django view for rendering the welcome page.
+    If the user is already authenticated, redirect to the dashboard.
+    """
+    if request.user.is_authenticated:
+        return redirect('home')  # Redirect authenticated users to the home
+
+    return render(request, 'backend/welcome.html')
 
 def register(request):
     if request.method == "POST":
@@ -48,6 +64,19 @@ def custom_login_view(request):
             return render(request, "backend/login.html", {"error": "Invalid credentials"})
 
     return render(request, "backend/login.html")
+
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET", "POST"])
+@login_required
+def custom_logout(request):
+    if request.method == 'POST':
+        logout(request)
+        request.session.flush()  # Clears all session data
+        return redirect('login')
+    
+    # For GET requests, show confirmation page
+    return render(request, 'backend/logout.html')
 
 # Home views
 @login_required
@@ -87,22 +116,88 @@ def dashboard(request):
     }
     return render(request, "backend/dashboard.html", context)
 
+def contact_us_view(request):
+    """
+    Django view for handling contact form submissions.
+    """
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your message has been sent successfully!")
+            return redirect('contact-us')
+    else:
+        form = ContactForm()
+
+    return render(request, 'backend/contact_us.html', {'form': form})
+
+#  Page views for footer links
+# def page_detail(request, slug):
+#     page = get_object_or_404(Page, slug=slug)
+#     return render(request, 'backend/page_detail.html', {'page': page})
+
+def page_detail(request, slug):
+    """
+    Django view for rendering dynamic pages.
+    """
+    page = get_object_or_404(Page, title__iexact=slug.replace('-', ' '))
+    context = {
+        'page': page,
+    }
+    return render(request, 'backend/page_detail.html', context)
 
 # < --------------------------------------------------------------------------------------------- >
 # Load CSV files (adjust paths if needed)
 import pandas as pd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-disease_path = os.path.join(BASE_DIR, 'disease_info.csv')
-supplement_path = os.path.join(BASE_DIR, 'supplement_info.csv')
 
-try:
-    disease_info = pd.read_csv(disease_path, encoding='cp1252')
-    supplement_info = pd.read_csv(supplement_path, encoding='cp1252')
-except FileNotFoundError:
-    print("Error: 'supplement_info.csv' not found. Ensure the file is in the correct directory.")
-    supplement_info = None  # Or handle it accordingly
-    print("Error: 'disease_info.csv' not found. Ensure the file is in the correct directory.")
-    disease_info = None  # Or handle it accordingly
+def load_disease_and_supplement_info():
+    """
+    Load disease and supplement information from CSV files.
+    Returns:
+        - transform_index_to_disease: A dictionary mapping indices to disease details.
+        - supplement_info: A DataFrame containing supplement information.
+    """
+    # Construct full file paths
+    disease_path = os.path.join(BASE_DIR, 'disease_info.csv')
+    supplement_path = os.path.join(BASE_DIR, 'supplement_info.csv')
+
+    try:
+        # Load disease info
+        disease_info = pd.read_csv(disease_path, encoding='cp1252')
+        
+        # Convert disease_info to the desired dictionary format
+        transform_index_to_disease = {
+            row['index']: (
+                row['disease_name'], 
+                row['description'], 
+                row['Possible Steps'], 
+                row['image_url']
+            )
+            for _, row in disease_info.iterrows()
+        }
+
+    except FileNotFoundError as e:
+        print(f"Error: {e.filename} not found. Ensure the file is in the correct directory.")
+        transform_index_to_disease = None
+
+    try:
+        # Load supplement info
+        supplement_info = pd.read_csv(supplement_path, encoding='cp1252')
+    except FileNotFoundError as e:
+        print(f"Error: {e.filename} not found. Ensure the file is in the correct directory.")
+        supplement_info = None
+
+    return transform_index_to_disease, supplement_info
+
+# Load disease and supplement info
+transform_index_to_disease, supplement_info = load_disease_and_supplement_info()
+
+# Example usage
+if transform_index_to_disease is not None and supplement_info is not None:
+    print("Disease and supplement info loaded successfully!")
+else:
+    print("Failed to load disease or supplement info.")
 
 # Load the AI Model
 model = CNN.CNN(39)
@@ -126,61 +221,162 @@ def prediction(image_path):
 
 def disease_detection_view(request):
     """
-    Django view for handling image upload and disease prediction.
+    Django view for handling image upload, disease prediction, and saving data to the database.
     """
     if request.method == "POST":
-        # Get the uploaded image
-        image = request.FILES['image']
-        
-        # Save the image to the 'static/uploads' directory
-        upload_dir = 'static/uploads'
-        os.makedirs(upload_dir, exist_ok=True)  # Create the directory if it doesn't exist
-        file_path = os.path.join(upload_dir, image.name)
-        with open(file_path, 'wb+') as destination:
-            for chunk in image.chunks():
-                destination.write(chunk)
-        
-        # Make a prediction
-        pred_index = prediction(file_path)
-        
-        # Retrieve disease details
-        title = disease_info['disease_name'][pred_index]
-        description = disease_info['description'][pred_index]
-        prevent = disease_info['Possible Steps'][pred_index]
-        image_url = disease_info['image_url'][pred_index]
-        supplement_name = supplement_info['supplement name'][pred_index]
-        supplement_image_url = supplement_info['supplement image'][pred_index]
-        supplement_buy_link = supplement_info['buy link'][pred_index]
+        form = DetectionForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Process the uploaded image
+            image = form.cleaned_data['image']
+            area = form.cleaned_data['area']
+            notes = form.cleaned_data['notes']
 
-        print(f"Prediction Index: {pred_index}")
-        print(f"Title: {title}")
-        print(f"Description: {description}")
-        print(f"Image URL: {image_url}")
+            # Save the image temporarily
+            upload_dir = 'static/uploads'
+            os.makedirs(upload_dir, exist_ok=True)  # Ensure directory exists
+            file_path = os.path.join(upload_dir, image.name)
+            with open(file_path, 'wb+') as destination:
+                for chunk in image.chunks():
+                    destination.write(chunk)
 
-        # Render the results
-        return render(request, 'backend/disease_result.html', {
-            'title': title,
-            'desc': description,
-            'prevent': prevent,
-            'image_url': image_url,
-            'pred': pred_index,
-            'sname': supplement_name,
-            'simage': supplement_image_url,
-            'buy_link': supplement_buy_link,
-        })
+            # Perform AI-based prediction
+            pred_index = prediction(file_path)
+            print(f"Prediction Index: {pred_index}")  # Debugging line
 
-    return render(request, 'backend/disease_detection.html')
+            # Handle unknown or invalid predictions
+            if pred_index < 0 or pred_index >= len(transform_index_to_disease):
+                print(f"Invalid prediction index: {pred_index}")
+                pred_index = -1  # Set to unknown index
+
+            # Retrieve disease details
+            try:
+                disease_details = transform_index_to_disease[pred_index]
+                if len(disease_details) < 4:  # Ensure tuple has at least 4 elements
+                    raise KeyError("Disease details are incomplete")
+
+                disease_name = disease_details[0]  # Name is at index 0
+                description = disease_details[1]   # Description is at index 1
+                prevention = disease_details[2]    # Prevention steps are at index 2
+                image_url = disease_details[3]    # Image URL is at index 3
+
+                # Extract plant and disease names
+                plant_name, disease_name = disease_name.split(':') if ':' in disease_name else ('Unknown', 'Unknown')
+                plant_name = plant_name.strip()
+                disease_name = disease_name.strip()
+
+                # Get or create corresponding objects in the database
+                plant, _ = Plant.objects.get_or_create(name=plant_name, defaults={
+                    'scientific_name': f'{plant_name} spp.',  # Default scientific name
+                    'description': 'Healthy plant.',
+                    'image': f'plants/{plant_name.lower().replace(" ", "_")}_healthy.jpg'  # Default healthy image
+                })
+
+                disease, _ = Disease.objects.get_or_create(name=disease_name, defaults={
+                    'description': description,
+                    'prevention_steps': prevention,
+                    'plant': plant
+                })
+
+                # Create a DiseaseDetection record
+                detection = DiseaseDetection.objects.create(
+                    farmer=request.user if request.user.is_authenticated else None,
+                    plant=plant,
+                    disease=disease,
+                    image=image,
+                    area=area,
+                    notes=notes,
+                    created_at=now()
+                )
+
+                print(f"Disease Name: {disease_name}")
+                print(f"Description: {description}")
+                print(f"Prevention: {prevention}")
+                print(f"Image URL: {image_url}")
+
+                # Render the results
+                return render(request, 'backend/disease_result.html', {
+                    'title': disease_name,
+                    'desc': description,
+                    'prevent': prevention,
+                    'image_url': image_url,
+                    'detection': detection
+                })
+            except (KeyError, IndexError):
+                # Handle unknown diseases
+                disease_name = "Unknown"
+                description = "The AI engine was unable to identify the disease."
+                prevention = "Please consult an agricultural expert for further assistance."
+                image_url = None
+
+                # Create a generic DiseaseDetection record for unknown cases
+                detection = DiseaseDetection.objects.create(
+                    farmer=request.user if request.user.is_authenticated else None,
+                    plant=None,
+                    disease=None,
+                    image=image,
+                    area=area,
+                    notes=notes,
+                    created_at=now()
+                )
+
+                return render(request, 'backend/disease_result.html', {
+                    'title': disease_name,
+                    'desc': description,
+                    'prevent': prevention,
+                    'image_url': image_url,
+                    'detection': detection
+                })
+    else:
+        form = DetectionForm()
+
+    return render(request, 'backend/disease_detection.html', {'form': form})
+
+# Trending Diseases API
+def trending_diseases_api(request):
+    """
+    Returns JSON data of the top 5 trending diseases in a specific area.
+    """
+    # Get query parameters
+    area = request.GET.get('area', 'default_area')  # Default to 'default_area'
+    start_date = request.GET.get('start_date', None)  # Optional: Filter by date range
+    end_date = request.GET.get('end_date', None)
+
+    # Filter detections by area and date range
+    queryset = DiseaseDetection.objects.filter(area=area)
+    if start_date and end_date:
+        queryset = queryset.filter(created_at__range=[start_date, end_date])
+
+    # Aggregate data by disease
+    trending = (
+        queryset.values('disease__name')
+        .annotate(count=Count('id'))
+        .order_by('-count')[:5]  # Top 5 trending diseases
+    )
+
+    # Convert to list for JSON response
+    data = [{'disease_name': d['disease__name'], 'count': d['count']} for d in trending]
+    return JsonResponse(data, safe=False)
+
+def news_view(request):
+    """
+    Django view for displaying news updates.
+    """
+    news_updates = NewsUpdate.objects.all()[:10]  # Fetch the latest 10 updates
+    context = {
+        'news_updates': news_updates,
+    }
+    return render(request, 'backend/news.html', context)
 
 def market_view(request):
     """
     View to display disease-related supplements.
     """
-    return render(request, 'backend/market.html', {
-        'supplement_image': list(supplement_info['supplement image']),
-        'supplement_name': list(supplement_info['supplement name']),
-        'disease': list(disease_info['disease_name']),
-        'buy': list(supplement_info['buy link'])
-    })
+    # return render(request, 'backend/market.html', {
+    #     'supplement_image': list(supplement_info['supplement image']),
+    #     'supplement_name': list(supplement_info['supplement name']),
+    #     'disease': list(disease_info['disease_name']),
+    #     'buy': list(supplement_info['buy link'])
+    # })
 
 
 

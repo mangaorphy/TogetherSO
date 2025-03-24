@@ -7,8 +7,9 @@ from . import views
 urlpatterns = [
 
     # Authentication URLs for the login, creating an account, and logging out
+    path('', views.welcome_view, name='welcome'),  # Default landing page
     path("login/", views.custom_login_view, name="login"),
-    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("logout/", views.custom_logout, name="logout"),
     path("register/", views.register, name="register"),
     path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
     path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
@@ -21,9 +22,25 @@ urlpatterns = [
 
     # Dashboard Page
     path('dashboard/', views.dashboard, name='dashboard'),
+    path("trending-diseases/", views.trending_diseases_api, name="trending-diseases-api"),
+
+    # News Page
+    path('news/', views.news_view, name='news'),
+
+    # Contact Page
+    path('contact-us/', views.contact_us_view, name='contact-us'),
 
     # About Page
     path('services/', views.services, name='services'),
+
+    # Footer Pages
+    path('pages/<slug:slug>/', views.page_detail, name='page_detail'),
+
+    # path('about/', views.page_detail, {'slug': 'about'}, name='about'),
+    # path('pricing/', views.page_detail, {'slug': 'pricing'}, name='pricing'),
+    # path('careers/', views.page_detail, {'slug': 'careers'}, name='careers'),
+    # path('help/', views.page_detail, {'slug': 'help'}, name='help'),
+    # path('<slug:slug>/', views.page_detail, name='dynamic-page'),
 
     # AI-based plant disease detection
     path('submit', views.disease_detection_view, name='submit'),

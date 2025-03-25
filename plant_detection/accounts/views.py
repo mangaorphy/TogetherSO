@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str # force_text on older versions of Django
 
-from .forms import SignUpForm, token_generator, user_model
+from .forms import SignUpForm, token_generator
 
 class SignUpView(CreateView):
     form_class = SignUpForm 
@@ -58,13 +58,13 @@ class SuccessView(TemplateView):
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
 
-class CustomLoginView(LoginView):
-    template_name = 'account/login.html'
+# class CustomLoginView(LoginView):
+#     template_name = 'account/login.html'
 
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('dashboard')  # Redirect authenticated users to the dashboard
-        return super().dispatch(request, *args, **kwargs)
+#     def dispatch(self, request, *args, **kwargs):
+#         if request.user.is_authenticated:
+#             return redirect('dashboard')  # Redirect authenticated users to the dashboard
+#         return super().dispatch(request, *args, **kwargs)
     
 
 from django.contrib.auth import logout
@@ -88,21 +88,27 @@ def custom_login_view(request):
     Custom login view for TogetherSO.
     """
     if request.user.is_authenticated:
-        return redirect('dashboard')  # Redirect authenticated users to the dashboard
+        return redirect('dashboard')  # Redirect authenticated users
 
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
-        if user is not None and user.is_active:
-            login(request, user)
-            return redirect('dashboard')  # Redirect to dashboard after successful login
+        
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                messages.error(request, 'Account not activated. Please check your email.')
         else:
-            messages.error(request, 'Invalid credentials or account not activated.')
-            return redirect('login')  # Redirect back to login page with error message
-
-    return render(request, 'accounts/login.html')  # Use the accounts login template
+            messages.error(request, 'Invalid username or password.')
+        
+        return redirect('login')  # Always redirect after POST
+    
+    # GET request - show login form
+    return render(request, 'accounts/login.html')
 
 def register(request):
     """

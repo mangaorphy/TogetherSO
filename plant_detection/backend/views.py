@@ -20,52 +20,29 @@ from django.db.models import Count
 from django.http import JsonResponse
 from django.utils.timezone import now
 from django.contrib import messages
+from django.views.decorators.http import require_http_methods
 
 # Authentication views
 
-def welcome_view(request):
-    """
-    Django view for rendering the welcome page.
-    If the user is already authenticated, redirect to the dashboard.
-    """
-    if request.user.is_authenticated:
-        return redirect('home')  # Redirect authenticated users to the home
 
-    return render(request, 'backend/welcome.html')
+# def register(request):
+#     if request.method == "POST":
+#         username = request.POST["username"]
+#         email = request.POST["email"]
+#         password = request.POST["password"]
+#         confirm_password = request.POST["confirm_password"]
 
-def register(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        email = request.POST["email"]
-        password = request.POST["password"]
-        confirm_password = request.POST["confirm_password"]
-
-        if password != confirm_password:
-            return render(request, "backend/register.html", {"error": "Passwords do not match"})
+#         if password != confirm_password:
+#             return render(request, "backend/register.html", {"error": "Passwords do not match"})
         
-        if User.objects.filter(username=username).exists():
-            return render(request, "backend/register.html", {"error": "Username already taken"})
+#         if User.objects.filter(username=username).exists():
+#             return render(request, "backend/register.html", {"error": "Username already taken"})
 
-        user = User.objects.create_user(username=username, email=email, password=password)
-        login(request, user)
-        return redirect("home")
+#         user = User.objects.create_user(username=username, email=email, password=password)
+#         login(request, user)
+#         return redirect("home")
 
-    return render(request, "backend/register.html")
-
-def custom_login_view(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect("home")  # Redirect to home after login
-        else:
-            return render(request, "backend/login.html", {"error": "Invalid credentials"})
-
-    return render(request, "backend/login.html")
-
-from django.views.decorators.http import require_http_methods
+#     return render(request, "backend/register.html")
 
 @require_http_methods(["GET", "POST"])
 @login_required

@@ -35,6 +35,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'  # SendGrid API key as username
 EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')  # SendGrid API key as password
 
+# The email you'll be sending emails from
+DEFAULT_FROM_EMAIL = os.getenv('FROM_EMAIL', default='noreply@gmail.com')
+LOGIN_REDIRECT_URL = 'success'
+
 # Security Settings
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True

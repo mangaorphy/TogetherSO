@@ -1,0 +1,29 @@
+<!-- accounts/logout.html -->
+
+{% extends 'backend/base.html' %}
+
+{% block title %}Confirm Logout | TogetherSO{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow p-4 bg-light" style="border-radius: 10px;">
+                <i class="fas fa-sign-out-alt fa-4x text-danger text-center mb-4"></i>
+                <h2 class="text-center fw-bold mb-4">Confirm Logout</h2>
+                <p class="text-center lead">Are you sure you want to log out?</p>
+
+                <form method="post" class="text-center mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 mb-3">
+                        <i class="fas fa-sign-out-alt me-2"></i> Log Out
+                    </button>
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary w-100">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

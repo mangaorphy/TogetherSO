@@ -1,0 +1,15 @@
+<!-- users/check_email.html -->
+
+{% extends 'accounts/base.html' %}
+
+{% block title %}Check Your Email | TogetherSO{% endblock %}
+
+{% block body %}
+<div class="text-center">
+    <h1 class="auth-title">Activate Your Account</h1>
+    <p class="auth-subtitle">We've sent you an activation link to your email address. Please verify your email to complete the registration process.</p>
+    <p class="auth-subtitle text-muted">If you don't see the email, check your spam folder or contact support.</p>
+</div>
+
+<a href="{% url 'resend_activation' %}" class="btn-auth mt-4">Resend Activation Email</a>
+{% endblock body %}

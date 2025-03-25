@@ -41,8 +41,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "backend",
+     'accounts',
+     'crispy_forms',
+    'crispy_bootstrap5',
     # "axes",
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -95,17 +102,29 @@ WSGI_APPLICATION = "plant_detection.wsgi.application"
 # Remove hardcoded credentials
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('DB_NAME', ''),
         'USER': os.environ.get('DB_USER', ''),
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
-        'PORT': os.environ.get('DB_PORT', '3306'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
         'OPTIONS': {
-            'charset': 'utf8mb4',
+            'client_encoding': 'UTF8',  # Correct parameter for PostgreSQL
         },
     }
 }
+
+# Email Backend
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'  # SendGrid API key as username
+EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')  # SendGrid API key as password
+
+# The email you'll be sending emails from
+DEFAULT_FROM_EMAIL = os.getenv('FROM_EMAIL', default='noreply@gmail.com')
+LOGIN_REDIRECT_URL = 'success'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -184,10 +203,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-LOGIN_REDIRECT_URL = "/api/home/"  # More logical endpoint
-LOGOUT_REDIRECT_URL = "/"  # Redirect to welcome page
-LOGIN_URL = "/accounts/login/"  # Standard auth URL
-
+LOGIN_URL = 'login'  # Name of the login URL
+LOGOUT_REDIRECT_URL = 'welcome'  # Redirect after logout
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DATABASES['default']['CONN_MAX_AGE'] = 300 

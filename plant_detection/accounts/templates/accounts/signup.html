@@ -1,0 +1,62 @@
+<!-- accounts/signup.html -->
+
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block title %}Sign Up | TogetherSO{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow p-4 bg-light" style="border-radius: 10px;">
+                <h2 class="text-center fw-bold mb-4">Sign Up</h2>
+
+                <form method="POST" action="{% url 'signup' %}" class="mt-4">
+                    {% csrf_token %}
+                    {% if messages %}
+                        <ul class="messages text-center">
+                            {% for message in messages %}
+                                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <!-- Username Input -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label sr-only">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required autocomplete="off">
+                    </div>
+
+                    <!-- Email Input -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label sr-only">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required autocomplete="off">
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="mb-3">
+                        <label for="password1" class="form-label sr-only">Password</label>
+                        <input type="password" id="password1" name="password1" class="form-control" placeholder="Enter your password" required autocomplete="new-password">
+                    </div>
+
+                    <!-- Confirm Password Input -->
+                    <div class="mb-3">
+                        <label for="password2" class="form-label sr-only">Confirm Password</label>
+                        <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm your password" required autocomplete="new-password">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-auth w-100 mb-3">Register</button>
+
+                    <!-- Login Link -->
+                    <p class="text-center">
+                        Already have an account? 
+                        <a href="{% url 'login' %}" class="text-success">Log In</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

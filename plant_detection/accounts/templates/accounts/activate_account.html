@@ -1,0 +1,25 @@
+
+<!-- users/activate_account.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activate Your TogetherSO Account</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; text-align: center;">
+        <h2 style="color: #043610;">Welcome to TogetherSO, {{ user.username }}!</h2>
+        <p style="color: #6c757d;">Thank you for signing up on our platform. To activate your account, please click the button below:</p>
+        <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" 
+           style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Activate Account
+        </a>
+        <p style="color: #6c757d; margin-top: 20px;">If the button doesn't work, copy and paste the following link into your browser:</p>
+        <p style="color: #4CAF50; font-size: 1rem;">
+            http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+        </p>
+    </div>
+</body>
+</html>

@@ -101,18 +101,11 @@ WSGI_APPLICATION = "plant_detection.wsgi.application"
 import dj_database_url
 # Remove hardcoded credentials
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'), conn_max_age=600),
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.environ.get('DB_NAME', ''),
-    #     'USER': os.environ.get('DB_USER', ''),
-    #     'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-    #     'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
-    #     'PORT': os.environ.get('DB_PORT', '5432'),
-    #     'OPTIONS': {
-    #         'client_encoding': 'UTF8',  # Correct parameter for PostgreSQL
-    #     },
-    # }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),  # Render automatically provides this
+        conn_max_age=600,
+        ssl_require=True  # Essential for production
+    )
 }
 
 # Email Backend

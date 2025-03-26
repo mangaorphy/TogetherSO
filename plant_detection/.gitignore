@@ -7,3 +7,26 @@ plant_disease_model_1_latest.pt
 venv/
 *.pyc   
 *.dmg
+# Add these lines to prevent future commits of large files
+*.dmg
+*.zip
+*.tar
+*.gz
+*.mp4
+*.mov
+*.avi
+*.pdf
+*.psd
+*.sqlite3
+
+# Specifically ignore the PostgreSQL installer
+plant_detection/backend/static/images/postgresql-*.dmg
+
+# Also ignore common system files
+.DS_Store
+*.swp
+*.swo
+__pycache__/
+*.py[cod]
+*$py.class
+plant_detection/backend/static/images/postgresql-*.dmg

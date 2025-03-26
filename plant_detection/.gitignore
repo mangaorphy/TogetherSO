@@ -30,3 +30,5 @@ __pycache__/
 *.py[cod]
 *$py.class
 plant_detection/backend/static/images/postgresql-*.dmg
+plant_detection/backend/static/images/postgresql-*.dmg
+*.dmg

@@ -28,9 +28,11 @@ SECRET_KEY = "django-insecure-f+zim%y#$_+a$em=&ex=p83u10b#xrf6820cd6p4%bffn01cv$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
-# Application definition
+ALLOWED_HOSTS = [
+    'togetherso.onrender.com',
+    'localhost',
+    '127.0.0.1'
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -108,7 +110,7 @@ DATABASES = {
     )
 }
 
-MODEL_URL = os.getenv('GOOGLE_DRIVE_MODEL_URL', '')
+# MODEL_URL = os.getenv('GOOGLE_DRIVE_MODEL_URL', '')
 
 # Email Backend
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

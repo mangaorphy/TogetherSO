@@ -21,6 +21,7 @@ from django.http import JsonResponse
 from django.utils.timezone import now
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+import requests
 
 # Authentication views
 
@@ -177,24 +178,84 @@ else:
     print("Failed to load disease or supplement info.")
 
 # Load the AI Model
-model = CNN.CNN(39)
-model_path = os.path.join(BASE_DIR, "plant_disease_model_1_latest.pt")
-model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-model.eval()
+# Global model variable
+from io import BytesIO
+import logging
+
+logger = logging.getLogger(__name__)
+
+model = None
+
+def load_model():
+    """
+    Loads the model from DigitalOcean Spaces with caching and error handling.
+    """
+    global model
+
+    if model is not None:
+        return model
+
+    try:
+        # DigitalOcean Spaces URL (use your actual URL)
+        model_url = "https://nyc3.digitaloceanspaces.com/togetherso/plant_disease_model_1_latest.pt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO00XXTGGEQWUWUEVH8H%2F20250327%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20250327T154845Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=cf50b8d97fbf2ce45176a9e9ea6424c25327e3e9d5c5f95945ecc4db98598dab"
+
+        # Download the model
+        logger.info("Downloading model from DigitalOcean Spaces...")
+        response = requests.get(model_url, stream=True)
+        response.raise_for_status()  # Raise exception for bad status codes
+
+        # Load directly into memory without saving to disk
+        model_bytes = BytesIO()
+        for chunk in response.iter_content(chunk_size=8192):
+            model_bytes.write(chunk)
+
+        # Load model from bytes
+        model_bytes.seek(0)
+        model = CNN.CNN(39)  # Initialize with correct number of classes
+        model.load_state_dict(torch.load(model_bytes, map_location=torch.device('cpu')))
+        model.eval()
+
+        logger.info("Model successfully loaded from DigitalOcean Spaces.")
+        return model
+
+    except Exception as e:
+        logger.error(f"Failed to load model: {str(e)}")
+        raise RuntimeError(f"Could not load model: {str(e)}")
+
+# Initialize model when Django starts
+try:
+    load_model()
+except Exception as e:
+    logger.error(f"Initial model loading failed: {str(e)}")
 
 # Function to make predictions
 def prediction(image_path):
     """
-    Function to load an image, process it, and predict the disease using the AI model.
+    Predicts the disease using the AI model loaded from DigitalOcean.
     """
-    image = Image.open(image_path)
-    image = image.resize((224, 224))
-    input_data = TF.to_tensor(image)
-    input_data = input_data.view((-1, 3, 224, 224))
-    output = model(input_data)
-    output = output.detach().numpy()
-    index = np.argmax(output)
-    return index
+    global model
+
+    try:
+        # Ensure model is loaded
+        if model is None:
+            load_model()
+
+        # Load and preprocess image
+        image = Image.open(image_path).convert('RGB')  # Convert to RGB to handle grayscale images
+        image = image.resize((224, 224))  # Resize image to match model input size
+        input_data = TF.to_tensor(image)  # Convert image to tensor
+        input_data = input_data.unsqueeze(0)  # Add batch dimension
+
+        # Make prediction
+        with torch.no_grad():  # Disable gradient computation for inference
+            output = model(input_data)
+            pred_index = output.argmax().item()  # Get the predicted class index
+
+        return pred_index
+
+    except Exception as e:
+        logger.error(f"Prediction failed: {str(e)}")
+        raise RuntimeError(f"Prediction error: {str(e)}")
 
 def disease_detection_view(request):
     """

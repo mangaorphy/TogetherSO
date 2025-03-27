@@ -104,9 +104,11 @@ DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv('DATABASE_URL'),  # Render automatically provides this
         conn_max_age=600,
-        ssl_require=True  # Essential for production
+        # ssl_require=True  # Essential for production
     )
 }
+
+MODEL_URL = os.getenv('GOOGLE_DRIVE_MODEL_URL', '')
 
 # Email Backend
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

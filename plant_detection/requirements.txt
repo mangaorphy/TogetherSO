@@ -33,4 +33,5 @@ tzdata==2025.1
 whitenoise==6.9.0
 django-crispy-forms==2.1
 crispy-bootstrap5==2023.10
+requests==2.32.3
 

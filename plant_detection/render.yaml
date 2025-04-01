@@ -1,7 +1,7 @@
 services:
   - type: web
     name: plant-detection
-    plan: starter  # 1GB RAM (required for ML workloads)
+    plan: standard  # 1GB RAM (required for ML workloads)
     env: python
     region: frankfurt  # Pick closest to your users
     buildCommand: |

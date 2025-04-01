@@ -184,75 +184,89 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Global model variable
 model = None
+MODEL_FILENAME = "plant_disease_model_1_latest.pt"
+MODEL_URL = "https://nyc3.digitaloceanspaces.com/togetherso/plant_disease_model_1_latest.pt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO00XXTGGEQWUWUEVH8H%2F20250327%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20250327T154845Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=cf50b8d97fbf2ce45176a9e9ea6424c25327e3e9d5c5f95945ecc4db98598dab"
 
 def load_model():
     """
-    Loads the model from DigitalOcean Spaces with caching and error handling.
+    Loads the model with local file fallback and proper resource cleanup.
     """
     global model
-
+    
     if model is not None:
         return model
 
+    model_path = os.path.join(os.path.dirname(__file__), MODEL_FILENAME)
+    
     try:
-        # DigitalOcean Spaces URL (use your actual URL)
-        model_url = "https://nyc3.digitaloceanspaces.com/togetherso/plant_disease_model_1_latest.pt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO00XXTGGEQWUWUEVH8H%2F20250327%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20250327T154845Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=cf50b8d97fbf2ce45176a9e9ea6424c25327e3e9d5c5f95945ecc4db98598dab"
-
-        # Download the model
+        # Try loading from local file first
+        if os.path.exists(model_path):
+            logger.info(f"Loading model from local file: {model_path}")
+            model = CNN.CNN(39)
+            model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+            model.eval()
+            return model
+        
+        # Download if local file doesn't exist
         logger.info("Downloading model from DigitalOcean Spaces...")
-        response = requests.get(model_url, stream=True)
-        response.raise_for_status()  # Raise exception for bad status codes
+        response = requests.get(MODEL_URL, stream=True, timeout=60)
+        response.raise_for_status()
 
-        # Load directly into memory without saving to disk
-        model_bytes = BytesIO()
-        for chunk in response.iter_content(chunk_size=8192):
-            model_bytes.write(chunk)
+        # Use context managers to ensure proper resource cleanup
+        with BytesIO() as model_bytes:
+            for chunk in response.iter_content(chunk_size=8192):
+                model_bytes.write(chunk)
+            
+            model_bytes.seek(0)
+            
+            # Load model
+            model = CNN.CNN(39)
+            model.load_state_dict(torch.load(model_bytes, map_location=torch.device('cpu')))
+            model.eval()
+            
+            # Save to local file for future use
+            try:
+                torch.save(model.state_dict(), model_path)
+                logger.info(f"Model saved locally at: {model_path}")
+            except Exception as save_error:
+                logger.warning(f"Could not save model locally: {save_error}")
+            
+            return model
 
-        # Load model from bytes
-        model_bytes.seek(0)
-        model = CNN.CNN(39)  # Initialize with correct number of classes
-        model.load_state_dict(torch.load(model_bytes, map_location=torch.device('cpu')))
-        model.eval()
-
-        logger.info("Model successfully loaded from DigitalOcean Spaces.")
-        return model
-
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Network error downloading model: {str(e)}")
+        raise RuntimeError("Could not download model. Check your internet connection.")
     except Exception as e:
         logger.error(f"Failed to load model: {str(e)}")
-        raise RuntimeError(f"Could not load model: {str(e)}")
+        model = None
+        raise RuntimeError(f"Model loading failed: {str(e)}")
 
-# Initialize model when Django starts
-try:
-    load_model()
-except Exception as e:
-    logger.error(f"Initial model loading failed: {str(e)}")
-
-# Function to make predictions
 def prediction(image_path):
     """
-    Predicts the disease using the AI model loaded from DigitalOcean.
+    Predicts plant disease from an image with proper resource handling.
     """
-    global model
-
     try:
         # Ensure model is loaded
         if model is None:
             load_model()
 
-        # Load and preprocess image
-        image = Image.open(image_path).convert('RGB')  # Convert to RGB to handle grayscale images
-        image = image.resize((224, 224))  # Resize image to match model input size
-        input_data = TF.to_tensor(image)  # Convert image to tensor
-        input_data = input_data.unsqueeze(0)  # Add batch dimension
+        # Load and preprocess image with context manager
+        with Image.open(image_path) as img:
+            image = img.convert('RGB').resize((224, 224))
+            input_data = TF.to_tensor(image).unsqueeze(0)
 
         # Make prediction
-        with torch.no_grad():  # Disable gradient computation for inference
+        with torch.no_grad():
             output = model(input_data)
-            pred_index = output.argmax().item()  # Get the predicted class index
+            pred_index = output.argmax().item()
 
         return pred_index
 
+    except FileNotFoundError:
+        logger.error(f"Image file not found: {image_path}")
+        raise
     except Exception as e:
         logger.error(f"Prediction failed: {str(e)}")
         raise RuntimeError(f"Prediction error: {str(e)}")

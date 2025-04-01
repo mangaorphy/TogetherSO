@@ -1,25 +1,23 @@
 services:
   - type: web
     name: plant-detection
-    plan: standard  # 1GB RAM (required for ML workloads)
+    plan: starter
     env: python
-    region: frankfurt  # Pick closest to your users
     buildCommand: |
+      # Remove LFS-tracked files from git cache
+      git rm --cached plant_detection/backend/plant_disease_model_1_latest.pt
+      
+      # Install dependencies
+      pip install --upgrade pip
       pip install -r requirements.txt
+      
+      # Download model directly
+      curl -L -o plant_detection/backend/plant_disease_model_1_latest.pt "https://nyc3.digitaloceanspaces.com/togetherso/plant_disease_model_1_latest.pt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO00XXTGGEQWUWUEVH8H%2F20250401%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20250401T130403Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=3cee128e5a74e4cb6f95fa3de4c1ead7021c6710b53d9d8c55374abf0c73ad4b" || echo "Model download skipped"
+      
       python manage.py collectstatic --noinput
-      # Pre-download models during build (optional)
-      curl -L -o model.h5 "https://nyc3.digitaloceanspaces.com/togetherso/plant_disease_model_1_latest.pt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO00XXTGGEQWUWUEVH8H%2F20250327%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20250327T154845Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=cf50b8d97fbf2ce45176a9e9ea6424c25327e3e9d5c5f95945ecc4db98598dab" || echo "Model download skipped"
     startCommand: |
       gunicorn plant_detection.wsgi:application \
         --workers 1 \
-        --timeout 5000 \  # 5-minute timeout for model loading
+        --timeout 300 \
         --bind 0.0.0.0:$PORT \
-        --preload \  # Load app before forking workers
-        --worker-class gthread \  # Better for I/O-bound apps
-        --threads 2
-    healthCheckPath: /health-check/  # Add a simple Django view
-    envVars:
-      - key: PYTHONUNBUFFERED
-        value: TRUE
-      - key: MODEL_PATH
-        value: ./model.h5  # Reference pre-downloaded model
+        --preload

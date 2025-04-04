@@ -1,47 +1,61 @@
-# accounts/forms.py
-
 from django import forms
-from django.contrib.auth.models import User
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+from django.conf import settings
 from .token import token_generator
 
-class SignUpForm(forms.ModelForm):
-    email = forms.EmailField(max_length=254, help_text="Enter a valid email address")
-    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
+User = get_user_model()
+
+class SignUpForm(UserCreationForm):
+    email = forms.EmailField(
+        max_length=254,
+        required=True,
+        help_text="Required. Enter a valid email address.",
+        widget=forms.EmailInput(attrs={'autocomplete': 'email'})
+    )
 
     class Meta:
         model = User
-        fields = ["username", "email", "password1", "password2"]
+        fields = ('username', 'email', 'password1', 'password2')
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get("password1")
-        password2 = cleaned_data.get("password2")
-
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Passwords do not match")
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email is already in use.")
+        return email
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
+        user.is_active = False  # User remains inactive until email verification
         if commit:
             user.save()
         return user
 
     def send_activation_email(self, request, user):
-        current_site = get_current_site(request)
-        subject = "Activate Your Account"
-        message = render_to_string(
-            "users/activate_account.html",
-            {
-                "user": user,
-                "domain": current_site.domain,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                "token": token_generator.make_token(user),
-            },
+        current_site = request.get_host()
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = token_generator.make_token(user)
+        
+        subject = 'Activate Your TogetherSO Account'
+        message = render_to_string('accounts/activate_account.html', {
+            'user': user,
+            'domain': current_site,
+            'uid': uid,
+            'token': token,
+            'protocol': 'https' if request.is_secure() else 'http'
+        })
+        
+        # Use EmailMessage for better control
+        email = EmailMessage(
+            subject,
+            message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[user.email],
+            reply_to=[settings.DEFAULT_FROM_EMAIL]
         )
-        user.email_user(subject, message, html_message=message)
+        email.content_subtype = "html"  # Enable HTML content
+        email.send(fail_silently=False)

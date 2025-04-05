@@ -26,6 +26,9 @@ Before running the application, ensure you have the following installed on your 
 - **MySQL or PostgreSQL**: For database storage.
 - **Git**: To clone the repository.
 - **Virtual Environment**: Recommended for isolating dependencies.
+* Download the pre-trained model file `plant_disease_model_1.pt` from [here](https://drive.google.com/drive/folders/1ewJWAiduGuld_9oGSrTuLumg9y62qS6A?usp=share_link)
+
+#After downloading it put it in the root directory of the app
 
 ---
 
@@ -33,8 +36,8 @@ Before running the application, ensure you have the following installed on your 
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-repo-url/togetherso.git
-   cd togetherso
+   https://github.com/mangaorphy/TogetherSO.git
+   cd plant_detection
    ```
 
 2. **Set Up a Virtual Environment**:
@@ -48,11 +51,6 @@ Before running the application, ensure you have the following installed on your 
    pip install -r requirements.txt
    ```
 
-   If using MySQL:
-   ```bash
-   pip install mysqlclient
-   ```
-
    If using PostgreSQL:
    ```bash
    pip install psycopg2-binary
@@ -63,10 +61,7 @@ Before running the application, ensure you have the following installed on your 
    ```plaintext
    DJANGO_SECRET_KEY=your_secret_key
    DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
-   DJANGO_DATABASE_URL=postgres://username:password@localhost:5432/togetherso
-   AWS_ACCESS_KEY_ID=your_aws_access_key_id
-   AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
-   AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
+   DJANGO_DATABASE_URL=postgres://username:password@localhost:5432/dbname
    DJANGO_EMAIL_USER=your_email@gmail.com
    DJANGO_EMAIL_PASSWORD=your_email_password
    ```
@@ -104,6 +99,12 @@ Before running the application, ensure you have the following installed on your 
 
 ---
 
+## ⭐Testing Images
+
+* If you do not have leaf images then you can use test images located in test_images folder
+* Each image has its corresponding disease name, so you can verify whether the model is working perfectly or not
+
+
 ## **Database Setup**
 
 TogetherSO supports both **MySQL** and **PostgreSQL**. Below are instructions for setting up each:
@@ -116,9 +117,9 @@ TogetherSO supports both **MySQL** and **PostgreSQL**. Below are instructions fo
 
 2. Create a Database and User:
    ```sql
-   CREATE DATABASE togetherso;
-   CREATE USER togetherso_user WITH PASSWORD 'your_password';
-   GRANT ALL PRIVILEGES ON DATABASE togetherso TO togetherso_user;
+   CREATE DATABASE yourusername;
+   CREATE USER yourname WITH PASSWORD 'your_password';
+   GRANT ALL PRIVILEGES ON DATABASE yourusername TO yourname;
    ```
 
 3. Update `settings.py`:
@@ -126,8 +127,8 @@ TogetherSO supports both **MySQL** and **PostgreSQL**. Below are instructions fo
    DATABASES = {
        'default': {
            'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'togetherso',
-           'USER': 'togetherso_user',
+           'NAME': 'yourusername',
+           'USER': 'yourname',
            'PASSWORD': 'your_password',
            'HOST': 'localhost',
            'PORT': '5432',
@@ -143,9 +144,9 @@ TogetherSO supports both **MySQL** and **PostgreSQL**. Below are instructions fo
 
 2. Create a Database and User:
    ```sql
-   CREATE DATABASE togetherso CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   CREATE USER 'togetherso_user'@'localhost' IDENTIFIED BY 'your_password';
-   GRANT ALL PRIVILEGES ON togetherso.* TO 'togetherso_user'@'localhost';
+   CREATE DATABASE dbname CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE USER 'name'@'localhost' IDENTIFIED BY 'your_password';
+   GRANT ALL PRIVILEGES ON dbname.* TO 'name'@'localhost';
    FLUSH PRIVILEGES;
    ```
 
@@ -154,8 +155,8 @@ TogetherSO supports both **MySQL** and **PostgreSQL**. Below are instructions fo
    DATABASES = {
        'default': {
            'ENGINE': 'django.db.backends.mysql',
-           'NAME': 'togetherso',
-           'USER': 'togetherso_user',
+           'NAME': 'dbname',
+           'USER': 'name',
            'PASSWORD': 'your_password',
            'HOST': 'localhost',
            'PORT': '3306',
@@ -195,66 +196,13 @@ TogetherSO supports both **MySQL** and **PostgreSQL**. Below are instructions fo
 
 ---
 
-## **Deployment Instructions**
-
-1. **Prepare for Deployment**:
-   - Update `production_settings.py` for production configurations.
-   - Set `DEBUG = False` and configure `ALLOWED_HOSTS`.
-
-2. **Deploy to Heroku**:
-   - Install Heroku CLI: [heroku.com/cli](https://devcenter.heroku.com/articles/heroku-cli).
-   - Log in to Heroku:
-     ```bash
-     heroku login
-     ```
-   - Create a new app:
-     ```bash
-     heroku create your-app-name
-     ```
-   - Push code to Heroku:
-     ```bash
-     git push heroku main
-     ```
-   - Run migrations on Heroku:
-     ```bash
-     heroku run python manage.py migrate
-     ```
-   - Collect static files:
-     ```bash
-     heroku run python manage.py collectstatic
-     ```
-
-3. **Set Config Vars**:
-   Set sensitive variables as Heroku config vars:
-   ```bash
-   heroku config:set DJANGO_SECRET_KEY=your_secret_key
-   heroku config:set DJANGO_ALLOWED_HOSTS=your-app-name.herokuapp.com
-   heroku config:set DJANGO_DATABASE_URL=postgres://username:password@host:port/dbname
-   heroku config:set AWS_ACCESS_KEY_ID=your_aws_access_key_id
-   heroku config:set AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
-   heroku config:set AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
-   heroku config:set DJANGO_EMAIL_USER=your_email@gmail.com
-   heroku config:set DJANGO_EMAIL_PASSWORD=your_email_password
-   ```
-
-4. **Enable HTTPS**:
-   Heroku automatically enables HTTPS with its free SSL certificate.
-
-5. **Monitor Logs**:
-   Check logs for debugging:
-   ```bash
-   heroku logs --tail
-   ```
-
----
-
 ## **Contributing**
 
 To contribute to TogetherSO:
 1. Fork the repository.
 2. Clone your forked repository:
    ```bash
-   git clone https://github.com/your-fork-url/togetherso.git
+   git clone https://github.com/mangaorphy/TogetherSO.git
    ```
 3. Create a new branch:
    ```bash
@@ -275,7 +223,7 @@ To contribute to TogetherSO:
 
 ## **License**
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **ALU License**. 
 
 ---
 
@@ -291,17 +239,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
     EMAIL_USE_TLS = True
     EMAIL_HOST_USER = os.getenv('DJANGO_EMAIL_USER')
     EMAIL_HOST_PASSWORD = os.getenv('DJANGO_EMAIL_PASSWORD')
-    ```
 
-- **Media Storage**:
-  - Use Amazon S3 or Google Cloud Storage for media uploads.
-  - Update `production_settings.py` with your AWS credentials:
-    ```python
-    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = 'your-s3-bucket-name'
-    MEDIA_URL = f'https://s3.amazonaws.com/{AWS_STORAGE_BUCKET_NAME}/media/'
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     ```
 
 - **Improving Accuracy**:
@@ -309,5 +247,3 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
   - Update the `CNN.py` file with improvements.
 
 ---
-
-This `README.md` provides a comprehensive guide for setting up, running, and deploying the TogetherSO application. Let me know if you'd like further refinements!

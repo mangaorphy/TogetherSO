@@ -187,7 +187,7 @@ logger = logging.getLogger(__name__)
 # Global model variable
 model = None
 MODEL_FILENAME = "plant_disease_model_1_latest.pt"
-MODEL_URL = "https://nyc3.digitaloceanspaces.com/togetherso/plant_disease_model_1_latest.pt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO00XXTGGEQWUWUEVH8H%2F20250327%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20250327T154845Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=cf50b8d97fbf2ce45176a9e9ea6424c25327e3e9d5c5f95945ecc4db98598dab"
+MODEL_URL = "https://nyc3.digitaloceanspaces.com/togetherso/plant_disease_model_1_latest.pt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO00XXTGGEQWUWUEVH8H%2F20250405%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20250405T085611Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7b49b14618306166741933dd5a595ae012de30d9ac0a5da87cce2935f9b6ca91"
 
 def load_model():
     """

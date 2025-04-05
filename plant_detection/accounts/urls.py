@@ -7,7 +7,8 @@ from .views import (
     custom_login_view,
     custom_logout,
     register,
-    welcome_view
+    welcome_view,
+    resend_activation 
 )
 from django.contrib.auth import views as auth_views
 
@@ -36,4 +37,5 @@ urlpatterns = [
     path('reset/done/', 
          auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), 
          name='password_reset_complete'),
+     path('resend-activation/', resend_activation, name='resend_activation'), 
 ]

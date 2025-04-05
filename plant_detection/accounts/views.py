@@ -153,3 +153,22 @@ def welcome_view(request):
         return redirect('home')  # Redirect authenticated accounts to the home
 
     return render(request, 'accounts/welcome.html')
+
+def resend_activation(request):
+    """
+    Resends the activation email to the user.
+    """
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            user = User.objects.get(email=email)
+            if user.is_active:
+                messages.warning(request, "This account is already activated.")
+                return redirect("login")
+            form = SignUpForm({"username": user.username, "email": user.email})
+            form.send_activation_email(request, user)
+            messages.success(request, "Activation email resent successfully!")
+        except User.DoesNotExist:
+            messages.error(request, "No account found with this email address.")
+        return redirect("check_email")
+    return render(request, "accounts/resend_activation.html")

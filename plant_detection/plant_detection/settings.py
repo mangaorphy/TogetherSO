@@ -195,7 +195,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media Files Configuration
 MEDIA_URL = '/media/'  # URL for accessing media files
-MEDIA_ROOT = BASE_DIR / 'media'  # Directory where media files are stored
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Directory where media files are stored
 
 # Ensure sessions expire when the browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

@@ -75,7 +75,7 @@
             {% for plant in featured_plants %}
             <div class="col-sm-12 col-md-6 col-lg-4">
                 <div class="card border-0 shadow-sm">
-                    <img src="{{ plant.image.url }}" class="card-img-top rounded-3" alt="{{ plant.name }}">
+                    <img src="{{ plant.image.url }}" class="card-img-top rounded-3" alt="{{ plant.name }}" onerror="this.src='{% static 'images/default_plant.jpg' %}'">
                     <div class="card-body">
                         <h5 class="card-title">{{ plant.name }}</h5>
                         <p class="card-text text-muted">{{ plant.description|truncatewords:10 }}</p>

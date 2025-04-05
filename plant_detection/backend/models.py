@@ -22,6 +22,13 @@ class Plant(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def image_url(self):
+        try:
+            return self.image.url
+        except ValueError:
+            return "{% static 'images/default_plant.jpg' %}"  # Fallback image
+
 class Pest(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)

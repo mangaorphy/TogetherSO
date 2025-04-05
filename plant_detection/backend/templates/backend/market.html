@@ -1,0 +1,49 @@
+{% extends "backend/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load humanize %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="{% static 'css/market.css' %}">
+{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Marketplace for plant disease supplements.">
+<meta name="keywords" content="plant disease, supplements, marketplace">
+<meta name="author" content="TogetherSO">
+{% endblock %}
+
+{% block title %}Marketplace | TogetherSO{% endblock %}
+
+{% block content %}
+<section class="market-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Supplements Marketplace</h2>
+            <p class="lead text-muted">Find the right supplements to treat plant diseases and improve crop health.</p>
+            <div class="small-border"></div>
+        </div>
+        <div class="row g-4">
+            {% for supplement in supplements %}
+            <div class="col-sm-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <img src="{{ supplement.supplement_image }}" class="card-img-top rounded-3" alt="{{ supplement.supplement_name }}" onerror="this.src='{% static 'images/default_supplement.jpg' %}'">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ supplement.disease_name }}</h5>
+                        <p class="card-text text-muted">{{ supplement.supplement_name }}</p>
+                        <a href="{{ supplement.buy_link }}" target="_blank" class="btn btn-success w-100">
+                            Buy Now <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No supplements available at this time.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

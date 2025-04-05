@@ -46,6 +46,9 @@ INSTALLED_APPS = [
      'accounts',
      'crispy_forms',
     'crispy_bootstrap5',
+    'widget_tweaks', 
+    'django.contrib.humanize',
+
     # "axes",
 ]
 

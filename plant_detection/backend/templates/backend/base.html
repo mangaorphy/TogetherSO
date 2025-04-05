@@ -172,6 +172,9 @@
                             <a class="nav-link" href="{% url 'services' %}">Services</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'market' %}">Marketplace</a>  <!-- Add this link -->
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'news' %}">News</a>
                         </li>
                         <li class="nav-item">
@@ -194,70 +197,7 @@
             </div>
         </nav>
         
-        <div class="py-lg-3 d-lg-flex slider-img">
-            <div class="container d-lg-flex align-items-center">
-                <div class="slide-wrap text-white">
-                    <p style="color:rgb(151, 25, 25);">Detect Earrly, Protect Always</p>
-                    <h1 class="fw-bold text-success slide-title">TogetherSO, DETECT EARLY, PROTECT ALWAYS</h1>
-                    <p class="slide-details text-success">
-                        One of the major causes of reduced crop yields is mainly due to diseases, and it's difficult to identify them before they damage the plants. With the help of <span class="fw-bold">TogetherSO</span>, we can all <span class="fw-bold text-success">Quickly identify</span> them before they damage our crops.
-                    </p>   
         
-                    <!-- Modal -->
-                    <div class="modal fade" id="analyzeModalToggle" aria-hidden="true"
-                        aria-labelledby="analyzeModalToggleLabel" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header bg-success-subtle">
-                                    <h5 class="modal-title text-success fw-bold" id="analyzeModalToggleLabel">Analyze Now</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-second">
-                                    <h1 class="fs-2 text-success">Are you ready to analyze your plant's health?</h1>
-                                    <p class="fs-5 text-muted">
-                                        Upload a leaf image, and our AI engine will provide an accurate diagnosis within seconds.
-                                    </p>
-                                </div>
-                                <div class="modal-footer bg-success-subtle">
-                                    <a href="{% url 'services' %}" class="btn btn-success px-4 py-2">
-                                        Analyze Now <i class="fas fa-leaf ms-2"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <div class="modal fade" id="analyzeModalToggle2" aria-hidden="true"
-                        aria-labelledby="analyzeModalToggleLabel2" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header bg-success-subtle">
-                                    <h5 class="modal-title text-success fw-bold" id="analyzeModalToggleLabel2">Processing...</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-center text-second">
-                                    <h1 class="fs-3 text-success">Your analysis is being processed.</h1>
-                                    <p class="text-muted">Please wait a moment while we detect potential diseases in your plant.</p>
-                                </div>
-                                <div class="modal-footer bg-success-subtle">
-                                    <button type="button" class="btn btn-success" data-bs-target="#analyzeModalToggle"
-                                        data-bs-toggle="modal" data-bs-dismiss="modal">
-                                        Back to Start <i class="fas fa-arrow-left ms-2"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-primary px-4 py-2 border-0" style="background-color: #4eda4e;"
-                        data-bs-toggle="modal" href="#analyzeModalToggle" role="button">
-                        Analyze Now <i class="fas fa-check-circle ms-2"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
 
     <!-- Main Content -->
     <main class="container mt-5">

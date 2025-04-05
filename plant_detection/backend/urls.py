@@ -24,6 +24,9 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path("trending-diseases/", views.trending_diseases_api, name="trending-diseases-api"),
 
+    #Market Page
+    path('market/', views.market_view, name='market'),
+
     # News Page
     path('news/', views.news_view, name='news'),
 

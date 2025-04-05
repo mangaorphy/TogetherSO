@@ -74,8 +74,11 @@
             <br>
             <br>
             <h6>{{ sname }}</h6>
-            <a target="_blank" href="{{ buy_link }}">
-              <button type="button" class="btn btn-success" style="background-color: #05380b;">Buy Product</button>
+            <a href="{% url 'market' %}" class="btn btn-outline-success">
+              View Marketplace
+            </a>
+            <a href="{{ buy_link }}" target="_blank" class="btn btn-success">
+              Buy Now
             </a>
           </center>
         </div>

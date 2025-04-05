@@ -418,17 +418,33 @@ def news_view(request):
         'news_updates': news_updates,
     }
     return render(request, 'backend/news.html', context)
-
+# Market view
+@login_required
 def market_view(request):
     """
-    View to display disease-related supplements.
+    Django view for displaying disease-related supplements.
     """
-    # return render(request, 'backend/market.html', {
-    #     'supplement_image': list(supplement_info['supplement image']),
-    #     'supplement_name': list(supplement_info['supplement name']),
-    #     'disease': list(disease_info['disease_name']),
-    #     'buy': list(supplement_info['buy link'])
-    # })
+    # Load supplement information from CSV
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    supplement_path = os.path.join(BASE_DIR, 'supplement_info.csv')
+
+    try:
+        supplement_info = pd.read_csv(supplement_path, encoding='cp1252')
+        # Convert DataFrame to a list of dictionaries for easier iteration in templates
+        supplements = [
+            {
+                'disease_name': row['disease_name'],
+                'supplement_name': row['supplement name'],
+                'supplement_image': row['supplement image'],
+                'buy_link': row['buy link']
+            }
+            for _, row in supplement_info.iterrows()
+        ]
+    except FileNotFoundError as e:
+        print(f"Error: {e.filename} not found. Ensure the file is in the correct directory.")
+        supplements = []
+
+    return render(request, 'backend/market.html', {'supplements': supplements})
 
 
 

@@ -64,6 +64,8 @@ def home(request):
     return render(request, 'backend/home.html', {'featured_plants': featured_plants})
 
 # Plant detail
+import logging
+
 logger = logging.getLogger(__name__)
 
 def plant_detail(request, plant_id):

@@ -182,9 +182,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-# Base directory
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
@@ -196,9 +193,16 @@ STATICFILES_DIRS = [
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media Files Configuration
-MEDIA_URL = '/media/'  # URL for accessing media files
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Directory where media files are stored
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+DO_SPACES_ACCESS_KEY_ID = os.getenv('DO_SPACES_ACCESS_KEY_ID')  # Set this in Render environment variables
+DO_SPACES_SECRET_ACCESS_KEY = os.getenv('DO_SPACES_SECRET_ACCESS_KEY')  # Set this in Render environment variables
+DO_SPACES_BUCKET_NAME = 'togethersomedia'  # Replace with your bucket name
+DO_SPACES_ENDPOINT_URL = 'https://togethersomedia.nyc3.digitaloceanspaces.com'  # Replace with your region's endpoint
+DO_SPACES_CUSTOM_DOMAIN = f'{DO_SPACES_BUCKET_NAME}.nyc3.digitaloceanspaces.com'
+
+MEDIA_URL = f"https://{DO_SPACES_CUSTOM_DOMAIN}/media/"
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Ensure sessions expire when the browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

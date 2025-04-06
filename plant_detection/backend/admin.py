@@ -11,8 +11,17 @@ class FarmerAdmin(admin.ModelAdmin):
 @admin.register(Plant)
 class PlantAdmin(admin.ModelAdmin):
     list_display = ('name', 'scientific_name', 'is_featured')
-    search_fields = ('name', 'scientific_name')
     list_filter = ('is_featured',)
+    search_fields = ('name', 'scientific_name')
+    ordering = ('name',)
+    fields = ('name', 'scientific_name', 'description', 'image', 'is_featured')
+
+    def save_model(self, request, obj, form, change):
+        """
+        Ensure the image is saved correctly.
+        """
+        super().save_model(request, obj, form, change)
+        print(f"Image saved successfully at: {obj.image.path}")  # Debugging line
 
 @admin.register(Pest)
 class PestAdmin(admin.ModelAdmin):

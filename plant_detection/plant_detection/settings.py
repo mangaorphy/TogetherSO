@@ -195,14 +195,24 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# DigitalOcean Spaces Configuration
 DO_SPACES_ACCESS_KEY_ID = os.getenv('DO_SPACES_ACCESS_KEY_ID')  # Set this in Render environment variables
 DO_SPACES_SECRET_ACCESS_KEY = os.getenv('DO_SPACES_SECRET_ACCESS_KEY')  # Set this in Render environment variables
 DO_SPACES_BUCKET_NAME = 'togethersomedia'  # Replace with your bucket name
-DO_SPACES_ENDPOINT_URL = 'https://togethersomedia.nyc3.digitaloceanspaces.com'  # Replace with your region's endpoint
-DO_SPACES_CUSTOM_DOMAIN = f'{DO_SPACES_BUCKET_NAME}.nyc3.digitaloceanspaces.com'
+DO_SPACES_REGION_NAME = 'nyc3'  # Replace with your region (e.g., nyc3)
+DO_SPACES_ENDPOINT_URL = f'https://{DO_SPACES_REGION_NAME}.digitaloceanspaces.com'  # Region-specific endpoint
+DO_SPACES_CUSTOM_DOMAIN = f'{DO_SPACES_BUCKET_NAME}.{DO_SPACES_REGION_NAME}.cdn.digitaloceanspaces.com'
 
-MEDIA_URL = f"https://{DO_SPACES_CUSTOM_DOMAIN}/media/"
+# Media Files
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = f"https://{DO_SPACES_CUSTOM_DOMAIN}/media/"
+AWS_S3_ENDPOINT_URL = DO_SPACES_ENDPOINT_URL
+AWS_ACCESS_KEY_ID = DO_SPACES_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = DO_SPACES_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = DO_SPACES_BUCKET_NAME
+AWS_S3_CUSTOM_DOMAIN = DO_SPACES_CUSTOM_DOMAIN
+AWS_DEFAULT_ACL = 'public-read'  # Ensure files are publicly readable
+AWS_QUERYSTRING_AUTH = False  # Disable query string authentication for public files
 
 # Ensure sessions expire when the browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

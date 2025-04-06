@@ -62,9 +62,13 @@ def home(request):
     # Fetch up to 3 featured plants randomly
     featured_plants = Plant.objects.filter(is_featured=True).order_by('?')[:3]
     return render(request, 'backend/home.html', {'featured_plants': featured_plants})
+
 # Plant detail
+logger = logging.getLogger(__name__)
+
 def plant_detail(request, plant_id):
     plant = get_object_or_404(Plant, pk=plant_id)
+    logger.info(f"Image URL for {plant.name}: {plant.image.url}")
     return render(request, 'backend/plant_detail.html', {'plant': plant})
 
 #  About views

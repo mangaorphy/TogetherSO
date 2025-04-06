@@ -77,6 +77,7 @@ Before running the application, ensure you have the following installed on your 
 
 1. **Apply Migrations**:
    ```bash
+   python manage.py makemigrations
    python manage.py migrate
    ```
 
@@ -93,8 +94,8 @@ Before running the application, ensure you have the following installed on your 
    Access the app at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 4. **Test the AI Engine**:
-   - Navigate to the detection page.
-   - Upload an image of a plant leaf.
+   - Navigate to the services page.
+   - Upload an image of a plant leaf.(FROM THE test_images folder)
    - The AI engine will analyze the image and display the predicted disease along with prevention steps.
 
 ---

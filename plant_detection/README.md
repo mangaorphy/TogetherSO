@@ -98,8 +98,9 @@ Before running the application, ensure you have the following installed on your 
    - The AI engine will analyze the image and display the predicted disease along with prevention steps.
 
 ---
-
+### NOTE
 ## ⭐Testing Images
+THE application model is only taking a selected number of images and for testing purposes, to get the results you test using this image dataset (https://data.mendeley.com/datasets/tywbtsjrjv/1) or test using images in the **test_images folder**
 
 * If you do not have leaf images then you can use test images located in test_images folder
 * Each image has its corresponding disease name, so you can verify whether the model is working perfectly or not

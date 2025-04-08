@@ -1,6 +1,9 @@
+from django.core.files.storage import default_storage 
 from django.db import models
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.contrib.auth.models import User 
+import logging
 
 class Farmer(models.Model):
     name = models.CharField(max_length=100)
@@ -11,19 +14,35 @@ class Farmer(models.Model):
     def __str__(self):
         return self.name
     
-
+logger = logging.getLogger(__name__)
 class Plant(models.Model):
     name = models.CharField(max_length=100)
     scientific_name = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='plants/', blank=True, null=True)  # Add an image field
+    image = models.ImageField(
+        upload_to='plants/', 
+        storage=default_storage,  # This ensures Spaces is used
+        blank=True, 
+        null=True
+    )  # Add an image field
     is_featured = models.BooleanField(default=False)  # New field for featured plants
+
+    def save(self, *args, **kwargs):
+        """
+        Overrides the save method to log image upload details.
+        """
+        super().save(*args, **kwargs)
+        if self.image:
+            logger.info(f"Image saved successfully for {self.name} at: {self.image.url}")
 
     def __str__(self):
         return self.name
 
     @property
     def image_url(self):
+        """
+        Returns the image URL or a fallback if the image is missing.
+        """
         try:
             return self.image.url
         except ValueError:

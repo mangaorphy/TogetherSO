@@ -23,6 +23,7 @@ urlpatterns = [
     # Dashboard Page
     path('dashboard/', views.dashboard, name='dashboard'),
     path("trending-diseases/", views.trending_diseases_api, name="trending-diseases-api"),
+    path('recommendation/<int:pk>/', views.RecommendationDetailView.as_view(), name='recommendation-detail'),
 
     #Market Page
     path('market/', views.market_view, name='market'),

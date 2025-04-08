@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("accounts.urls")),  # Include accounts URLs at the root
-    path("api/", include("backend.urls")), 
+    path("", include("backend.urls")), 
 ]
 
 # Serve media files during development

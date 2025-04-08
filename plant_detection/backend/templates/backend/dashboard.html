@@ -119,6 +119,9 @@
     </div>
     <div class="graph-container">
       <canvas id="trendingDiseasesChart"></canvas>
+      <p id="noDataMessage" style="display: none; text-align: center; color: #6C6C6C;">
+        No disease trends available for this area.
+      </p>
     </div>
   </div>
 </section>
@@ -164,18 +167,30 @@
 <section class="py-5 laptop">
   <div class="container">
     <div class="text-center mb-5">
-      <h2 class="fw-bold" style="color: #2c3e50;">Total Recommendations</h2>
+      <h2 class="fw-bold" style="color: #2c3e50;">Recent Recommendations ({{ total_recommendations }})</h2>
       <p class="lead" style="color: #7f8c8d;">Actionable insights provided to farmers</p>
       <div class="border-bottom" style="background-color: #4CAF50;"></div>
     </div>
     <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card dashboard-card">
+      {% if recent_recommendations %}
+      {% for recommendation in recent_recommendations %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card dashboard-card h-100">
           <div class="card-body text-center">
-            <p class="card-text">{{ total_recommendations }}</p>
+            <h5 class="card-title">{{ recommendation.title }}</h5>
+            <p class="card-text">{{ recommendation.content|truncatewords:10 }}</p>
+            <a href="{% url 'recommendation-detail' recommendation.id %}" class="btn btn-success mt-3">
+              View Details <i class="fas fa-arrow-right ms-2"></i>
+            </a>
           </div>
         </div>
       </div>
+      {% endfor %}
+      {% else %}
+      <div class="col-12 text-center">
+        <p class="text-muted">No recent recommendations available.</p>
+      </div>
+      {% endif %}
     </div>
   </div>
 </section>
@@ -184,12 +199,20 @@
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const ctx = document.getElementById('trendingDiseasesChart').getContext('2d');
+    const noDataMessage = document.getElementById('noDataMessage');
 
     // Function to update the chart
     function updateChart() {
-        fetch('/api/trending-diseases/')
+        fetch('/trending-diseases/?area=Zimbabwe')  // Specify area as needed
             .then(response => response.json())
             .then(data => {
+                if (data.length === 0 || data[0].disease_name === 'No Data') {
+                    noDataMessage.style.display = 'block';
+                    return;
+                }
+
+                noDataMessage.style.display = 'none';
+
                 const labels = data.map(item => item.disease_name);
                 const counts = data.map(item => item.count);
 
@@ -236,7 +259,11 @@
                     }
                 });
             })
-            .catch(error => console.error('Error fetching trending diseases:', error));
+            .catch(error => {
+                console.error('Error fetching trending diseases:', error);
+                noDataMessage.textContent = 'An error occurred while fetching disease trends.';
+                noDataMessage.style.display = 'block';
+            });
     }
 
     // Initial load
@@ -244,7 +271,7 @@
 
     // Periodically update the chart (e.g., every 30 seconds)
     setInterval(updateChart, 30000);  // 30 seconds in milliseconds
-});
+  });
 </script>
 
 {% endblock %}

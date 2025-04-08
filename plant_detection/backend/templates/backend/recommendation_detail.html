@@ -1,0 +1,330 @@
+{% load static %}
+
+<section class="py-5 recommendation-detail-section">
+  <div class="container">
+    <!-- Header Section with Visual Impact -->
+    <div class="text-center mb-5">
+      <div class="recommendation-icon mb-4">
+        <i class="fas fa-seedling"></i>
+      </div>
+      <h1 class="fw-bold text-primary">{{ recommendation.title }}</h1>
+      <div class="short-description mx-auto">
+        <p class="lead text-muted">{{ recommendation.content|truncatewords:15 }}</p>
+      </div>
+      <div class="divider mx-auto"></div>
+    </div>
+
+    <!-- Recommendation Details Card -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="recommendation-card">
+          <!-- Card Header -->
+          <div class="card-header">
+            <h2 class="card-title">
+              <i class="fas fa-clipboard-check me-2"></i>
+              Recommendation Details
+            </h2>
+          </div>
+          
+          <!-- Card Body -->
+          <div class="card-body">
+            <div class="content-box">
+              <h3 class="content-title">Solution</h3>
+              <div class="content-text">
+                {{ recommendation.content|linebreaks }}
+              </div>
+            </div>
+            
+            <!-- Related Information Section -->
+            <div class="related-info">
+              <h3 class="related-title">
+                <i class="fas fa-link me-2"></i>
+                Related Information
+              </h3>
+              
+              <div class="related-items">
+                {% if recommendation.disease %}
+                <div class="related-item disease-item">
+                  <div class="item-icon">
+                    <i class="fas fa-virus"></i>
+                  </div>
+                  <div class="item-content">
+                    <h4>Related Disease</h4>
+                    <p>{{ recommendation.disease.name }}</p>
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if recommendation.pest %}
+                <div class="related-item pest-item">
+                  <div class="item-icon">
+                    <i class="fas fa-bug"></i>
+                  </div>
+                  <div class="item-content">
+                    <h4>Related Pest</h4>
+                    <p>{{ recommendation.pest.name }}</p>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <!-- Card Footer with Back Button -->
+          <div class="card-footer">
+            <a href="{% url 'dashboard' %}" class="back-button">
+              <i class="fas fa-arrow-left me-2"></i>
+              Return to Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Custom CSS -->
+<style>
+  /* Base Styles */
+  :root {
+    --primary-color: #2e7d32;
+    --primary-light: #4caf50;
+    --secondary-color: #ff9800;
+    --danger-color: #e53935;
+    --text-dark: #263238;
+    --text-medium: #546e7a;
+    --text-light: #90a4ae;
+    --bg-light: #f5f5f5;
+    --border-radius: 12px;
+    --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fafafa;
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
+
+  /* Recommendation Section */
+  .recommendation-detail-section {
+    padding: 80px 0;
+    background-color: white;
+  }
+
+  /* Header Styles */
+  .recommendation-icon {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(46, 125, 50, 0.1);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .recommendation-icon i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+  }
+
+  .text-primary {
+    color: var(--primary-color) !important;
+  }
+
+  .short-description {
+    max-width: 700px;
+    font-size: 1.1rem;
+  }
+
+  .divider {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    margin: 25px auto;
+  }
+
+  /* Card Styles */
+  .recommendation-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+
+  .recommendation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  }
+
+  .card-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px 30px;
+  }
+
+  .card-header .card-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .card-header i {
+    font-size: 1.2rem;
+  }
+
+  .card-body {
+    padding: 30px;
+  }
+
+  /* Content Box */
+  .content-box {
+    margin-bottom: 30px;
+  }
+
+  .content-title {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+  }
+
+  .content-title:before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 25px;
+    background-color: var(--primary-color);
+    margin-right: 12px;
+    border-radius: 4px;
+  }
+
+  .content-text {
+    color: var(--text-medium);
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  /* Related Information */
+  .related-info {
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius);
+    padding: 25px;
+  }
+
+  .related-title {
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .related-title i {
+    color: var(--primary-color);
+    margin-right: 10px;
+  }
+
+  .related-items {
+    display: grid;
+    gap: 15px;
+  }
+
+  .related-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .item-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+
+  .disease-item .item-icon {
+    background-color: rgba(229, 57, 53, 0.1);
+  }
+
+  .disease-item .item-icon i {
+    color: var(--danger-color);
+    font-size: 1.3rem;
+  }
+
+  .pest-item .item-icon {
+    background-color: rgba(255, 152, 0, 0.1);
+  }
+
+  .pest-item .item-icon i {
+    color: var(--secondary-color);
+    font-size: 1.3rem;
+  }
+
+  .item-content h4 {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .item-content p {
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  /* Footer & Button */
+  .card-footer {
+    background-color: white;
+    padding: 20px 30px;
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+  }
+
+  .back-button:hover {
+    background-color: #1b5e20;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .recommendation-detail-section {
+      padding: 50px 0;
+    }
+    
+    .card-body {
+      padding: 20px;
+    }
+    
+    .related-info {
+      padding: 15px;
+    }
+  }
+</style>

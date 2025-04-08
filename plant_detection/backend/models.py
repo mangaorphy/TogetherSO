@@ -65,11 +65,22 @@ class Disease(models.Model):
         return f"{self.name} ({self.plant.name})"
     
 class DiseaseDetection(models.Model):
+    AREA_CHOICES = [
+        ('Zimbabwe', 'Zimbabwe'),
+        ('South Africa', 'South Africa'),
+        ('Zambia', 'Zambia'),
+        # Add other areas as needed
+    ]
+    
     farmer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='detections', null=True, blank=True)
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name='detections')
     disease = models.ForeignKey(Disease, on_delete=models.CASCADE, related_name='detections', null=True, blank=True)
     image = models.ImageField(upload_to='detections/', blank=True, null=True)
-    area = models.CharField(max_length=100, blank=True, null=True)
+    area = models.CharField(
+        max_length=100,
+        choices=AREA_CHOICES,
+        default='Zimbabwe'  # Zimbabwe will be selected by default
+    )
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(default=now)
 

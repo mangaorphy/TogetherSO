@@ -87,8 +87,11 @@ def dashboard(request):
     total_pests = Pest.objects.count()
     total_recommendations = Recommendation.objects.count()
 
-    # Example of recent activity (adjust query as needed)
-    recent_activity = Disease.objects.all().order_by('-id')[:5]  # Recent diseases detected
+    # Fetch recent recommendations
+    recent_recommendations = Recommendation.objects.all().order_by('-id')[:5]
+
+    # Fetch recent disease detections (adjust query as needed)
+    recent_activity = DiseaseDetection.objects.select_related('disease', 'disease__plant').order_by('-created_at')[:5]
 
     context = {
         "total_farmers": total_farmers,
@@ -96,9 +99,17 @@ def dashboard(request):
         "total_diseases": total_diseases,
         "total_pests": total_pests,
         "total_recommendations": total_recommendations,
+        "recent_recommendations": recent_recommendations,
         "recent_activity": recent_activity,
     }
     return render(request, "backend/dashboard.html", context)
+
+from django.views.generic import DetailView
+
+class RecommendationDetailView(DetailView):
+    model = Recommendation
+    template_name = 'backend/recommendation_detail.html'
+    context_object_name = 'recommendation'
 
 def contact_us_view(request):
     """
@@ -413,6 +424,11 @@ def trending_diseases_api(request):
 
     # Convert to list for JSON response
     data = [{'disease_name': d['disease__name'], 'count': d['count']} for d in trending]
+
+    # Handle empty data gracefully
+    if not data:
+        data = [{'disease_name': 'No Data', 'count': 0}]
+
     return JsonResponse(data, safe=False)
 
 def news_view(request):

@@ -287,11 +287,13 @@ def prediction(image_path):
     except Exception as e:
         logger.error(f"Prediction failed: {str(e)}")
         raise RuntimeError(f"Prediction error: {str(e)}")
-
 def disease_detection_view(request):
     """
     Django view for handling image upload, disease prediction, and saving data to the database.
     """
+    # Define default values for unknown cases
+    healthy_indices = [3, 5, 7, 11, 15, 18, 20, 23, 24, 25, 28, 38]
+
     if request.method == "POST":
         form = DetectionForm(request.POST, request.FILES)
         if form.is_valid():
@@ -304,6 +306,7 @@ def disease_detection_view(request):
             upload_dir = 'static/uploads'
             os.makedirs(upload_dir, exist_ok=True)  # Ensure directory exists
             file_path = os.path.join(upload_dir, image.name)
+
             with open(file_path, 'wb+') as destination:
                 for chunk in image.chunks():
                     destination.write(chunk)
@@ -317,8 +320,8 @@ def disease_detection_view(request):
                 print(f"Invalid prediction index: {pred_index}")
                 pred_index = -1  # Set to unknown index
 
-            # Retrieve disease details
             try:
+                # Retrieve disease details
                 disease_details = transform_index_to_disease[pred_index]
                 if len(disease_details) < 4:  # Ensure tuple has at least 4 elements
                     raise KeyError("Disease details are incomplete")
@@ -368,8 +371,11 @@ def disease_detection_view(request):
                     'desc': description,
                     'prevent': prevention,
                     'image_url': image_url,
-                    'detection': detection
+                    'detection': detection,
+                    'healthy_indices': healthy_indices,  # Pass the list of healthy indices
+                    'pred': pred_index,  # Pass the prediction index for conditional rendering
                 })
+
             except (KeyError, IndexError):
                 # Handle unknown diseases
                 disease_name = "Unknown"
@@ -393,8 +399,11 @@ def disease_detection_view(request):
                     'desc': description,
                     'prevent': prevention,
                     'image_url': image_url,
-                    'detection': detection
+                    'detection': detection,
+                    'healthy_indices': [],  # Empty list for unknown cases
+                    'pred': pred_index,  # Pass the prediction index for conditional rendering
                 })
+
     else:
         form = DetectionForm()
 
@@ -611,3 +620,4 @@ class RecommendationDeleteView(DeleteView):
     model = Recommendation
     template_name = 'backend/recommendation_confirm_delete.html'
     success_url = reverse_lazy('recommendation-list')
+# < --------------------------------------------------------------------------------------------- >

@@ -1,17 +1,16 @@
-
+{% extends 'backend/base.html' %}
 {% load static %}
-{% block pagetitle %}
-{{ title }}
-{% endblock pagetitle %}
-{% block body %}
 
+{% block pagetitle %}{{title}}{% endblock %}
+
+{% block content %}
 <div>
   <div class="container">
     <!-- Header Section -->
     <div class="row mb-5 text-center text-white">
       <div class="col-lg-10 mx-auto">
         <h1 class="display-4" style="padding-top: 2%; font-weight: 400; color: rgb(4, 54, 4);">
-          <b>{{ title }}🍂</b>
+          <b>{{title}}🍂</b>
         </h1>
       </div>
     </div>
@@ -21,9 +20,9 @@
       <div class="col">
         <div class="p-3 bg-white shadow rounded-lg" style="width: 30%;">
           {% if image_url %}
-          <img src="{{ image_url }}" width="350" height="350" alt="Disease Image">
+            <img src="{{ image_url }}" width="350" height="350" alt="Disease Image">
           {% else %}
-          <img src="{% static 'images/default_image.jpg' %}" width="350" height="350" alt="Default Image">
+            <img src="{% static 'images/default_image.jpg' %}" width="350" height="350" alt="Default Image">
           {% endif %}
         </div>
       </div>
@@ -36,9 +35,9 @@
         <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
           <h5><b>
               {% if pred in healthy_indices %}
-              Tips to Grow Healthy Plants :
+                Tips to Grow Healthy Plants :
               {% else %}
-              Brief Description :
+                Brief Description :
               {% endif %}
             </b></h5>
           <p>{{ desc }}</p>
@@ -52,9 +51,9 @@
         <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
           <h5><b>
               {% if pred in healthy_indices %}
-              Benefits :
+                Benefits :
               {% else %}
-              Prevent This Plant Disease By follow below steps :
+                Prevent This Plant Disease By Following These Steps :
               {% endif %}
             </b></h5>
           <p>{{ prevent }}</p>
@@ -68,9 +67,9 @@
           <center>
             <h5><b>
                 {% if pred in healthy_indices %}
-                Fertilizer :
+                  Fertilizer :
                 {% else %}
-                Supplements :
+                  Supplements :
                 {% endif %}
               </b></h5>
             <br>
@@ -100,5 +99,4 @@
     </div>
   </div>
 </div>
-
-{% endblock body %}
+{% endblock %}

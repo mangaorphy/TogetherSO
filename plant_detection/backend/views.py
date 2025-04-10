@@ -22,6 +22,7 @@ from django.utils.timezone import now
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 import requests
+from django.conf import settings
 
 # Authentication views
 
@@ -260,87 +261,87 @@ def load_model():
         model = None
         raise RuntimeError(f"Model loading failed: {str(e)}")
 
+# Load disease and supplement information
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+disease_info = pd.read_csv(os.path.join(BASE_DIR, 'disease_info.csv'), encoding='cp1252')
+supplement_info = pd.read_csv(os.path.join(BASE_DIR, 'supplement_info.csv'), encoding='cp1252')
+
 def prediction(image_path):
     """
-    Predicts plant disease from an image with proper resource handling.
+    Predicts plant disease from an image.
     """
     try:
-        # Ensure model is loaded
-        if model is None:
-            load_model()
-
-        # Load and preprocess image with context manager
         with Image.open(image_path) as img:
-            image = img.convert('RGB').resize((224, 224))
-            input_data = TF.to_tensor(image).unsqueeze(0)
-
-        # Make prediction
-        with torch.no_grad():
+            img = img.resize((224, 224))
+            input_data = TF.to_tensor(img).unsqueeze(0)  # Add batch dimension
             output = model(input_data)
-            pred_index = output.argmax().item()
+            probabilities = F.softmax(output, dim=1)
+            pred_index = torch.argmax(probabilities).item()
+            return pred_index
+    except Exception as e:
+        print(f"Error during prediction: {e}")
+        raise RuntimeError("Prediction failed")
 
-        return pred_index
 
     except FileNotFoundError:
         logger.error(f"Image file not found: {image_path}")
-        raise
+        raise FileNotFoundError(f"Image file not found: {image_path}")
+        
+    except Image.UnidentifiedImageError:
+        logger.error(f"Invalid image file: {image_path}")
+        raise ValueError("Invalid image file format")
+        
     except Exception as e:
-        logger.error(f"Prediction failed: {str(e)}")
+        logger.error(f"Prediction failed: {str(e)}", exc_info=True)
         raise RuntimeError(f"Prediction error: {str(e)}")
+        
 def disease_detection_view(request):
     """
     Django view for handling image upload, disease prediction, and saving data to the database.
     """
-    # Define default values for unknown cases
+    # Healthy indices for plants without diseases
     healthy_indices = [3, 5, 7, 11, 15, 18, 20, 23, 24, 25, 28, 38]
 
     if request.method == "POST":
         form = DetectionForm(request.POST, request.FILES)
         if form.is_valid():
-            # Process the uploaded image
-            image = form.cleaned_data['image']
-            area = form.cleaned_data['area']
-            notes = form.cleaned_data['notes']
-
-            # Save the image temporarily
-            upload_dir = 'static/uploads'
-            os.makedirs(upload_dir, exist_ok=True)  # Ensure directory exists
-            file_path = os.path.join(upload_dir, image.name)
-
-            with open(file_path, 'wb+') as destination:
-                for chunk in image.chunks():
-                    destination.write(chunk)
-
-            # Perform AI-based prediction
-            pred_index = prediction(file_path)
-            print(f"Prediction Index: {pred_index}")  # Debugging line
-
-            # Handle unknown or invalid predictions
-            if pred_index < 0 or pred_index >= len(transform_index_to_disease):
-                print(f"Invalid prediction index: {pred_index}")
-                pred_index = -1  # Set to unknown index
-
             try:
+                # Process the uploaded image
+                image = form.cleaned_data['image']
+                area = form.cleaned_data['area']
+                notes = form.cleaned_data['notes']
+
+                # Save the image temporarily
+                upload_dir = os.path.join(settings.BASE_DIR, 'static', 'uploads')
+                os.makedirs(upload_dir, exist_ok=True)
+                file_path = os.path.join(upload_dir, image.name)
+
+                with open(file_path, 'wb+') as destination:
+                    for chunk in image.chunks():
+                        destination.write(chunk)
+
+                # Perform AI-based prediction
+                pred_index = prediction(file_path)
+                print(f"Prediction Index: {pred_index}")
+
+                # Validate prediction index
+                if not transform_index_to_disease or pred_index < 0 or pred_index >= len(transform_index_to_disease):
+                    raise ValueError("Invalid prediction index")
+
                 # Retrieve disease details
                 disease_details = transform_index_to_disease[pred_index]
-                if len(disease_details) < 4:  # Ensure tuple has at least 4 elements
-                    raise KeyError("Disease details are incomplete")
+                if len(disease_details) < 4:
+                    raise KeyError("Incomplete disease details")
 
-                disease_name = disease_details[0]  # Name is at index 0
-                description = disease_details[1]   # Description is at index 1
-                prevention = disease_details[2]    # Prevention steps are at index 2
-                image_url = disease_details[3]    # Image URL is at index 3
-
-                # Extract plant and disease names
+                disease_name, description, prevention, image_url = disease_details
                 plant_name, disease_name = disease_name.split(':') if ':' in disease_name else ('Unknown', 'Unknown')
-                plant_name = plant_name.strip()
-                disease_name = disease_name.strip()
+                plant_name, disease_name = plant_name.strip(), disease_name.strip()
 
-                # Get or create corresponding objects in the database
+                # Create or retrieve Plant and Disease objects
                 plant, _ = Plant.objects.get_or_create(name=plant_name, defaults={
-                    'scientific_name': f'{plant_name} spp.',  # Default scientific name
+                    'scientific_name': f'{plant_name} spp.',
                     'description': 'Healthy plant.',
-                    'image': f'plants/{plant_name.lower().replace(" ", "_")}_healthy.jpg'  # Default healthy image
+                    'image': f'plants/{plant_name.lower().replace(" ", "_")}_healthy.jpg'
                 })
 
                 disease, _ = Disease.objects.get_or_create(name=disease_name, defaults={
@@ -349,7 +350,7 @@ def disease_detection_view(request):
                     'plant': plant
                 })
 
-                # Create a DiseaseDetection record
+                # Create DiseaseDetection record
                 detection = DiseaseDetection.objects.create(
                     farmer=request.user if request.user.is_authenticated else None,
                     plant=plant,
@@ -360,49 +361,37 @@ def disease_detection_view(request):
                     created_at=now()
                 )
 
-                print(f"Disease Name: {disease_name}")
-                print(f"Description: {description}")
-                print(f"Prevention: {prevention}")
-                print(f"Image URL: {image_url}")
-
-                # Render the results
+                # Render results
                 return render(request, 'backend/disease_result.html', {
                     'title': disease_name,
                     'desc': description,
                     'prevent': prevention,
                     'image_url': image_url,
                     'detection': detection,
-                    'healthy_indices': healthy_indices,  # Pass the list of healthy indices
-                    'pred': pred_index,  # Pass the prediction index for conditional rendering
+                    'healthy_indices': healthy_indices,
+                    'pred': pred_index,
                 })
 
-            except (KeyError, IndexError):
-                # Handle unknown diseases
-                disease_name = "Unknown"
-                description = "The AI engine was unable to identify the disease."
-                prevention = "Please consult an agricultural expert for further assistance."
-                image_url = None
-
-                # Create a generic DiseaseDetection record for unknown cases
-                detection = DiseaseDetection.objects.create(
-                    farmer=request.user if request.user.is_authenticated else None,
-                    plant=None,
-                    disease=None,
-                    image=image,
-                    area=area,
-                    notes=notes,
-                    created_at=now()
-                )
-
-                return render(request, 'backend/disease_result.html', {
-                    'title': disease_name,
-                    'desc': description,
-                    'prevent': prevention,
-                    'image_url': image_url,
-                    'detection': detection,
-                    'healthy_indices': [],  # Empty list for unknown cases
-                    'pred': pred_index,  # Pass the prediction index for conditional rendering
-                })
+            except Exception as e:
+                print(f"Error during prediction or data retrieval: {e}")
+                context = {
+                    'title': "Unknown",
+                    'desc': "The AI engine was unable to identify the disease.",
+                    'prevent': "Please consult an agricultural expert for further assistance.",
+                    'image_url': "/static/images/default_image.jpg",
+                    'detection': DiseaseDetection.objects.create(
+                        farmer=request.user if request.user.is_authenticated else None,
+                        plant=None,
+                        disease=None,
+                        image=image,
+                        area=area,
+                        notes=notes,
+                        created_at=now()
+                    ),
+                    'healthy_indices': [],
+                    'pred': -1,
+                }
+                return render(request, 'backend/disease_result.html', context)
 
     else:
         form = DetectionForm()

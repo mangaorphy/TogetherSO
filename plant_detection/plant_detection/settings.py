@@ -97,23 +97,26 @@ WSGI_APPLICATION = "plant_detection.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-import dj_database_url
-# Remove hardcoded credentials
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),  # Render automatically provides this
-        conn_max_age=600,
-        # ssl_require=True  # Essential for production
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',  # Use PostgreSQL backend
+        'NAME': os.getenv('DB_NAME', 'TogetherSO'),  # Database name
+        'USER': os.getenv('DB_USER', 'manga'),       # Database user
+        'PASSWORD': os.getenv('DB_PASSWORD', 'Seuphro44#'),  # Database password
+        'HOST': os.getenv('DB_HOST', 'localhost'),   # Database host
+        'PORT': os.getenv('DB_PORT', '5432'),        # Database port
+    }
 }
+# import dj_database_url
+# # Remove hardcoded credentials
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=os.getenv('DATABASE_URL'),  # Render automatically provides this
+#         conn_max_age=600,
+#         # ssl_require=True  # Essential for production
+#     )
+# }
 
-# MODEL_URL = os.getenv('GOOGLE_DRIVE_MODEL_URL', '')
 
 # Email Backend
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

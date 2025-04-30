@@ -11,9 +11,10 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import torch
 import torchvision.transforms.functional as TF
+import torch.nn.functional as F
 from django.core.exceptions import ObjectDoesNotExist
 import numpy as np
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from . import CNN
 from PIL import Image
 from django.db.models import Count
@@ -147,256 +148,84 @@ def page_detail(request, slug):
 import pandas as pd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def load_disease_and_supplement_info():
-    """
-    Load disease and supplement information from CSV files.
-    Returns:
-        - transform_index_to_disease: A dictionary mapping indices to disease details.
-        - supplement_info: A DataFrame containing supplement information.
-    """
-    # Construct full file paths
-    disease_path = os.path.join(BASE_DIR, 'disease_info.csv')
-    supplement_path = os.path.join(BASE_DIR, 'supplement_info.csv')
+disease_path = os.path.join(BASE_DIR, 'disease_info.csv')
+supplement_path = os.path.join(BASE_DIR, 'supplement_info.csv')
 
-    try:
-        # Load disease info
-        disease_info = pd.read_csv(disease_path, encoding='cp1252')
-        
-        # Convert disease_info to the desired dictionary format
-        transform_index_to_disease = {
-            row['index']: (
-                row['disease_name'], 
-                row['description'], 
-                row['Possible Steps'], 
-                row['image_url']
-            )
-            for _, row in disease_info.iterrows()
-        }
+disease_info = pd.read_csv(disease_path , encoding='cp1252')
+supplement_info = pd.read_csv(supplement_path, encoding='cp1252')
 
-    except FileNotFoundError as e:
-        print(f"Error: {e.filename} not found. Ensure the file is in the correct directory.")
-        transform_index_to_disease = None
+import os
 
-    try:
-        # Load supplement info
-        supplement_info = pd.read_csv(supplement_path, encoding='cp1252')
-    except FileNotFoundError as e:
-        print(f"Error: {e.filename} not found. Ensure the file is in the correct directory.")
-        supplement_info = None
-
-    return transform_index_to_disease, supplement_info
-
-# Load disease and supplement info
-transform_index_to_disease, supplement_info = load_disease_and_supplement_info()
-
-# Example usage
-if transform_index_to_disease is not None and supplement_info is not None:
-    print("Disease and supplement info loaded successfully!")
-else:
-    print("Failed to load disease or supplement info.")
-
-# Load the AI Model
-# Global model variable
-from io import BytesIO
-import logging
-
-logger = logging.getLogger(__name__)
-
-# Global model variable
-model = None
-MODEL_FILENAME = "plant_disease_model_1_latest.pt"
-MODEL_URL = "https://nyc3.digitaloceanspaces.com/togetherso/plant_disease_model_1_latest.pt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=DO00XXTGGEQWUWUEVH8H%2F20250405%2Fnyc3%2Fs3%2Faws4_request&X-Amz-Date=20250405T085611Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7b49b14618306166741933dd5a595ae012de30d9ac0a5da87cce2935f9b6ca91"
-
-def load_model():
-    """
-    Loads the model with local file fallback and proper resource cleanup.
-    """
-    global model
-    
-    if model is not None:
-        return model
-
-    model_path = os.path.join(os.path.dirname(__file__), MODEL_FILENAME)
-    
-    try:
-        # Try loading from local file first
-        if os.path.exists(model_path):
-            logger.info(f"Loading model from local file: {model_path}")
-            model = CNN.CNN(39)
-            model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-            model.eval()
-            return model
-        
-        # Download if local file doesn't exist
-        logger.info("Downloading model from DigitalOcean Spaces...")
-        response = requests.get(MODEL_URL, stream=True, timeout=60)
-        response.raise_for_status()
-
-        # Use context managers to ensure proper resource cleanup
-        with BytesIO() as model_bytes:
-            for chunk in response.iter_content(chunk_size=8192):
-                model_bytes.write(chunk)
-            
-            model_bytes.seek(0)
-            
-            # Load model
-            model = CNN.CNN(39)
-            model.load_state_dict(torch.load(model_bytes, map_location=torch.device('cpu')))
-            model.eval()
-            
-            # Save to local file for future use
-            try:
-                torch.save(model.state_dict(), model_path)
-                logger.info(f"Model saved locally at: {model_path}")
-            except Exception as save_error:
-                logger.warning(f"Could not save model locally: {save_error}")
-            
-            return model
-
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Network error downloading model: {str(e)}")
-        raise RuntimeError("Could not download model. Check your internet connection.")
-    except Exception as e:
-        logger.error(f"Failed to load model: {str(e)}")
-        model = None
-        raise RuntimeError(f"Model loading failed: {str(e)}")
-
-# Load disease and supplement information
+# Define the absolute path to the model file
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-disease_info = pd.read_csv(os.path.join(BASE_DIR, 'disease_info.csv'), encoding='cp1252')
-supplement_info = pd.read_csv(os.path.join(BASE_DIR, 'supplement_info.csv'), encoding='cp1252')
+MODEL_PATH = os.path.join(BASE_DIR, "plant_disease_model_1_latest.pt")
+
+# Load the model
+model = CNN.CNN(39)
+model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device('cpu')))
+model.eval()
 
 def prediction(image_path):
-    """
-    Predicts plant disease from an image.
-    """
-    try:
-        with Image.open(image_path) as img:
-            img = img.resize((224, 224))
-            input_data = TF.to_tensor(img).unsqueeze(0)  # Add batch dimension
-            output = model(input_data)
-            probabilities = F.softmax(output, dim=1)
-            pred_index = torch.argmax(probabilities).item()
-            return pred_index
-    except Exception as e:
-        print(f"Error during prediction: {e}")
-        raise RuntimeError("Prediction failed")
-
-
-    except FileNotFoundError:
-        logger.error(f"Image file not found: {image_path}")
-        raise FileNotFoundError(f"Image file not found: {image_path}")
-        
-    except Image.UnidentifiedImageError:
-        logger.error(f"Invalid image file: {image_path}")
-        raise ValueError("Invalid image file format")
-        
-    except Exception as e:
-        logger.error(f"Prediction failed: {str(e)}", exc_info=True)
-        raise RuntimeError(f"Prediction error: {str(e)}")
+    image = Image.open(image_path)
+    image = image.resize((224, 224))
+    input_data = TF.to_tensor(image)
+    input_data = input_data.view((-1, 3, 224, 224))
+    output = model(input_data)
+    output = output.detach().numpy()
+    index = np.argmax(output)
+    return index
         
 def disease_detection_view(request):
-    """
-    Django view for handling image upload, disease prediction, and saving data to the database.
-    """
-    # Healthy indices for plants without diseases
-    healthy_indices = [3, 5, 7, 11, 15, 18, 20, 23, 24, 25, 28, 38]
+    if request.method == 'POST':
+        # Use request.FILES instead of request.files
+        if 'image' not in request.FILES:
+            return render(request, 'backend/disease_detection.html', {
+                'error': 'No image file was uploaded'
+            })
+            
+        image = request.FILES['image']
+        filename = image.name  # Use .name instead of .filename
+        upload_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
+        os.makedirs(upload_dir, exist_ok=True)
+        file_path = os.path.join(upload_dir, filename)
+        
+        # Save the uploaded file properly
+        with open(file_path, 'wb+') as destination:
+            for chunk in image.chunks():
+                destination.write(chunk)
+        
+        print(file_path)
+        
+        try:
+            pred = prediction(file_path)
+            title = disease_info['disease_name'][pred]
+            description = disease_info['description'][pred]
+            prevent = disease_info['Possible Steps'][pred]
+            image_url = disease_info['image_url'][pred]
+            supplement_name = supplement_info['supplement name'][pred]
+            supplement_image_url = supplement_info['supplement image'][pred]
+            supplement_buy_link = supplement_info['buy link'][pred]
+            
+            return render(request, 'backend/disease_detection.html', {
+                'title': title,
+                'desc': description,
+                'prevent': prevent,
+                'image_url': image_url,
+                'pred': pred,
+                'sname': supplement_name,
+                'simage': supplement_image_url,
+                'buy_link': supplement_buy_link,
+                'healthy_indices': [3, 5, 7, 11, 15, 18, 20, 23, 24, 25, 28, 38]  # Add healthy indices
+            })
+            
+        except Exception as e:
+            print(f"Error during prediction: {str(e)}")
+            return render(request, 'backend/disease_detection.html', {
+                'error': 'Error processing the image'
+            })
 
-    if request.method == "POST":
-        form = DetectionForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                # Process the uploaded image
-                image = form.cleaned_data['image']
-                area = form.cleaned_data['area']
-                notes = form.cleaned_data['notes']
-
-                # Save the image temporarily
-                upload_dir = os.path.join(settings.BASE_DIR, 'static', 'uploads')
-                os.makedirs(upload_dir, exist_ok=True)
-                file_path = os.path.join(upload_dir, image.name)
-
-                with open(file_path, 'wb+') as destination:
-                    for chunk in image.chunks():
-                        destination.write(chunk)
-
-                # Perform AI-based prediction
-                pred_index = prediction(file_path)
-                print(f"Prediction Index: {pred_index}")
-
-                # Validate prediction index
-                if not transform_index_to_disease or pred_index < 0 or pred_index >= len(transform_index_to_disease):
-                    raise ValueError("Invalid prediction index")
-
-                # Retrieve disease details
-                disease_details = transform_index_to_disease[pred_index]
-                if len(disease_details) < 4:
-                    raise KeyError("Incomplete disease details")
-
-                disease_name, description, prevention, image_url = disease_details
-                plant_name, disease_name = disease_name.split(':') if ':' in disease_name else ('Unknown', 'Unknown')
-                plant_name, disease_name = plant_name.strip(), disease_name.strip()
-
-                # Create or retrieve Plant and Disease objects
-                plant, _ = Plant.objects.get_or_create(name=plant_name, defaults={
-                    'scientific_name': f'{plant_name} spp.',
-                    'description': 'Healthy plant.',
-                    'image': f'plants/{plant_name.lower().replace(" ", "_")}_healthy.jpg'
-                })
-
-                disease, _ = Disease.objects.get_or_create(name=disease_name, defaults={
-                    'description': description,
-                    'prevention_steps': prevention,
-                    'plant': plant
-                })
-
-                # Create DiseaseDetection record
-                detection = DiseaseDetection.objects.create(
-                    farmer=request.user if request.user.is_authenticated else None,
-                    plant=plant,
-                    disease=disease,
-                    image=image,
-                    area=area,
-                    notes=notes,
-                    created_at=now()
-                )
-
-                # Render results
-                return render(request, 'backend/disease_result.html', {
-                    'title': disease_name,
-                    'desc': description,
-                    'prevent': prevention,
-                    'image_url': image_url,
-                    'detection': detection,
-                    'healthy_indices': healthy_indices,
-                    'pred': pred_index,
-                })
-
-            except Exception as e:
-                print(f"Error during prediction or data retrieval: {e}")
-                context = {
-                    'title': "Unknown",
-                    'desc': "The AI engine was unable to identify the disease.",
-                    'prevent': "Please consult an agricultural expert for further assistance.",
-                    'image_url': "/static/images/default_image.jpg",
-                    'detection': DiseaseDetection.objects.create(
-                        farmer=request.user if request.user.is_authenticated else None,
-                        plant=None,
-                        disease=None,
-                        image=image,
-                        area=area,
-                        notes=notes,
-                        created_at=now()
-                    ),
-                    'healthy_indices': [],
-                    'pred': -1,
-                }
-                return render(request, 'backend/disease_result.html', context)
-
-    else:
-        form = DetectionForm()
-
-    return render(request, 'backend/disease_detection.html', {'form': form})
+    # Handle GET requests or other methods
+    return render(request, 'backend/disease_detection.html')
 
 # Trending Diseases API
 def trending_diseases_api(request):

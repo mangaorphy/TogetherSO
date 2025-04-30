@@ -1,16 +1,19 @@
 {% extends 'backend/base.html' %}
 {% load static %}
 
-{% block pagetitle %}{{title}}{% endblock %}
+{% block pagetitle %}
+{{ title }}
+{% endblock pagetitle %}
 
 {% block content %}
+
 <div>
   <div class="container">
     <!-- Header Section -->
     <div class="row mb-5 text-center text-white">
       <div class="col-lg-10 mx-auto">
-        <h1 class="display-4" style="padding-top: 2%; font-weight: 400; color: rgb(4, 54, 4);">
-          <b>{{title}}🍂</b>
+        <h1 style="color: black;" class="display-4" style="padding-top: 2%; font-weight: 400; color: rgb(4, 54, 4);">
+          <b>{{ title }}🍂</b>
         </h1>
       </div>
     </div>
@@ -33,14 +36,14 @@
     <div class="row">
       <div class="col mx-auto">
         <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
-          <h5><b>
-              {% if pred in healthy_indices %}
-                Tips to Grow Healthy Plants :
-              {% else %}
-                Brief Description :
-              {% endif %}
-            </b></h5>
-          <p>{{ desc }}</p>
+          <h5 style="color: black;"><b>
+            {% if pred == 3 or pred == 5 or pred == 7 or pred == 11 or pred == 15 or pred == 18 or pred == 20 or pred == 23 or pred == 24 or pred == 25 or pred == 28 or pred == 38 %}
+              Tips to Grow Healthy Plants :
+            {% else %}
+              Brief Description :
+            {% endif %}
+          </b></h5>
+          <p style="color: black;">{{ desc|default:"No description available." }}</p>
         </div>
       </div>
     </div>
@@ -49,14 +52,14 @@
     <div class="row">
       <div class="col mx-auto">
         <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
-          <h5><b>
-              {% if pred in healthy_indices %}
+          <h5 style="color: black;"><b>
+              {% if pred == 3 or pred == 5 or pred == 7 or pred == 11 or pred == 15 or pred == 18 or pred == 20 or pred == 23 or pred == 24 or pred == 25 or pred == 28 or pred == 38 %}
                 Benefits :
               {% else %}
                 Prevent This Plant Disease By Following These Steps :
               {% endif %}
             </b></h5>
-          <p>{{ prevent }}</p>
+          <p>{{ prevent|default:"No prevention steps available." }}</p>
         </div>
       </div>
 
@@ -65,19 +68,19 @@
       <div class="col mx-auto">
         <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
           <center>
-            <h5><b>
-                {% if pred in healthy_indices %}
+            <h5 style="color: black;"><b>
+                {% if pred == 3 or pred == 5 or pred == 7 or pred == 11 or pred == 15 or pred == 18 or pred == 20 or pred == 23 or pred == 24 or pred == 25 or pred == 28 or pred == 38 %}
                   Fertilizer :
                 {% else %}
                   Supplements :
                 {% endif %}
               </b></h5>
             <br>
-            <img src="{{ simage }}" width="300" height="350" alt="Supplement Image">
+            <img src="{{ simage|default:'/static/images/default_supplement.jpg' }}" width="300" height="350" alt="Supplement Image">
             <br>
             <br>
-            <h6>{{ sname }}</h6>
-            <a target="_blank" href="{{ buy_link }}">
+            <h6>{{ sname|default:"No supplement available." }}</h6>
+            <a target="_blank" href="{{ buy_link|default:'#' }}">
               <button type="button" class="btn btn-success" style="background-color: #05380b;">
                 Buy Product
               </button>
@@ -99,4 +102,5 @@
     </div>
   </div>
 </div>
-{% endblock %}
+
+{% endblock content %}

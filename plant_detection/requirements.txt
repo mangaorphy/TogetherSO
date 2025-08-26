@@ -38,7 +38,7 @@ six==1.17.0
 sqlparse==0.5.3
 starkbank-ecdsa==2.2.0
 sympy==1.13.3
-torch==2.2.2
+torch==2.8.0
 torchvision==0.17.2
 typing_extensions==4.12.2
 tzdata==2025.1
